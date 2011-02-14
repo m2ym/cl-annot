@@ -6,7 +6,7 @@
 (in-package cl-annot-asd)
 
 (defsystem cl-annot
-    :version "0.1"
-    :author "Tomohiro Matsuyama"
-    :license "LLGPL"
-    :components ((:file "annot")))
+  :version "0.1"
+  :author "Tomohiro Matsuyama"
+  :license "LLGPL"
+  :components ((:file "annot")))
