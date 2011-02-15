@@ -11,8 +11,6 @@
 
 (in-package :cl-annot)
 
-(defparameter *annot-nest* 0)
-
 (defmacro with-gensyms (vars &body body)
   `(let ,(loop for var in vars
                collect `(,var ',(gensym)))
@@ -47,7 +45,7 @@ method."
     (cons
      (if (eq (car value) 'cl:setf)
          (cadr value)
-         (error "Unknown cons format")))
+         (error "Unknown cons format for exporting")))
     (symbol value)
     (class (class-name value))
     (standard-generic-function (function-name value))
@@ -57,7 +55,9 @@ method."
   (export (value-symbol value)))
 
 (defmacro ignore* (var)
-  `(declare (ignore ,var)))
+  (if (listp var)
+      `(declare (ignore ,@var))
+      `(declare (ignore ,var))))
 
 (defun read-annotator (stream)
   "Read annotator specification from the STREAM."
@@ -69,15 +69,19 @@ method."
 
 (defun annot-syntax-reader (stream char)
   (declare (ignore char))
-  (multiple-value-bind (annotator macroexpand)
+  (multiple-value-bind (annotator expand)
       (read-annotator stream)
-    (let* ((*annot-nest* (1+ *annot-nest*))
-           (arg (read stream t nil t)))
-      (if (eq *annot-nest* 1)
-          (let ((form `(,annotator ,arg)))
-            (if macroexpand
-                (macroexpand form)
-                form))
+    (let* ((arg (read stream t nil t))
+           (form `(,annotator ,arg)))
+      (if (or ;; macro form
+              (and (symbolp annotator)
+                   (macro-function annotator))
+              ;; lambda special form
+              (and (consp annotator)
+                   (eq (car annotator) 'cl:lambda)))
+          (if expand
+              (macroexpand form)
+              form)
           (with-gensyms (v)
             `(let ((,v ,arg))
                (,annotator ,v) ,v))))))
