@@ -22,8 +22,9 @@
   #+sbcl (slot-value (slot-value method 'sb-pcl::%generic-function) 'sb-pcl::name)
   #+ccl (slot-value (slot-value method 'generic-function) 'ccl::name)
   #+allegro (slot-value (slot-value method 'generic-function) 'excl::name)
+  #+clisp (slot-value (slot-value method 'clos::$gf) 'clos::$name)
   #+(or ecl lispworks) (slot-value (slot-value method 'generic-function) 'clos::name)
-  #-(or sbcl ccl allegro ecl lispworks) (error "method-name is not supported"))
+  #-(or sbcl ccl allegro clisp ecl lispworks) (error "method-name is not supported"))
 
 (defun value-symbol (value)
   "Return the symbol of the VALUE. VALUE can be symbol, class, and
