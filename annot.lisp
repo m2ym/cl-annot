@@ -3,7 +3,9 @@
 (defpackage cl-annot
   (:use :cl)
   (:nicknames :annot)
-  (:export :method-name
+  (:export :function-name
+           :method-function
+           :method-name
            :value-symbol
            :export*
            :enable-annot-syntax))
@@ -17,14 +19,27 @@
                collect `(,var ',(gensym)))
      ,@body))
 
+(defun function-name (function)
+  "Return the symbol of the FUNCTOIN."
+  #+sbcl (slot-value function 'sb-pcl::name)
+  #+ccl (slot-value function 'ccl::name)
+  #+allegro (slot-value function 'excl::name)
+  #+clisp (slot-value function 'clos::$name)
+  #+(or ecl lispworks) (slot-value function 'clos::name)
+  #-(or sbcl ccl allegro clisp ecl lispworks) (error "method-name is not supported"))
+
+(defun method-function (method)
+  "Return the generic function of the METHOD."
+  #+sbcl (slot-value method 'sb-pcl::%generic-function)
+  #+ccl (slot-value method 'generic-function)
+  #+allegro (slot-value method 'generic-function)
+  #+clisp (slot-value method 'clos::$gf)
+  #+(or ecl lispworks) (slot-value method 'generic-function)
+  #-(or sbcl ccl allegro clisp ecl lispworks) (error "method-function is not supported"))
+
 (defun method-name (method)
   "Return the symbol of the METHOD."
-  #+sbcl (slot-value (slot-value method 'sb-pcl::%generic-function) 'sb-pcl::name)
-  #+ccl (slot-value (slot-value method 'generic-function) 'ccl::name)
-  #+allegro (slot-value (slot-value method 'generic-function) 'excl::name)
-  #+clisp (slot-value (slot-value method 'clos::$gf) 'clos::$name)
-  #+(or ecl lispworks) (slot-value (slot-value method 'generic-function) 'clos::name)
-  #-(or sbcl ccl allegro clisp ecl lispworks) (error "method-name is not supported"))
+  (function-name (method-function method)))
 
 (defun value-symbol (value)
   "Return the symbol of the VALUE. VALUE can be symbol, class, and
@@ -32,10 +47,11 @@ method."
   (etypecase value
     (symbol value)
     (class (class-name value))
+    (standard-generic-function (function-name value))
     (standard-method (method-name value))))
 
 (defun export* (value)
-  "Export the symbol of the VALUE. Unlike EXPORT, VALUE could also be
+  "Export the symbol of the OBJEC. Unlike EXPORT, VALUE could also be
 classes and methods."
   (export (value-symbol value)))
 
