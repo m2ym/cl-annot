@@ -7,7 +7,6 @@
            :method-function
            :method-name
            :value-symbol
-           :export*
            :enable-annot-syntax))
 
 (in-package :cl-annot)
@@ -55,15 +54,17 @@ method."
     (standard-method (method-name value))))
 
 (defun export* (value)
-  "Export the symbol of the OBJEC. Unlike EXPORT, VALUE could also be
-classes and methods."
   (export (value-symbol value)))
+
+(defmacro ignore* (var)
+  `(declare (ignore ,var)))
 
 (defun read-annotator (stream)
   "Read annotator specification from the STREAM."
   (let ((annotator (read stream t nil t)))
     (case annotator
       (cl:export 'export*)
+      (cl:ignore 'ignore*)
       (t annotator))))
 
 (defun annot-syntax-reader (stream char)
