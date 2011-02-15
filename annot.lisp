@@ -45,6 +45,10 @@
   "Return the symbol of the VALUE. VALUE can be symbol, class, and
 method."
   (etypecase value
+    (cons
+     (if (eq (car value) 'cl:setf)
+         (cadr value)
+         (error "Unknown cons format")))
     (symbol value)
     (class (class-name value))
     (standard-generic-function (function-name value))
