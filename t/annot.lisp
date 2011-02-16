@@ -3,7 +3,10 @@
 (defpackage cl-annot-test
   (:use :cl
         :cl-test-more
-        :cl-annot))
+        :cl-annot
+        :cl-annot.util
+        :cl-annot.std
+        :cl-annot.eval-when))
 
 (in-package :cl-annot-test)
 
@@ -53,5 +56,17 @@
 (is '@type (integer v)
     '(declare (type (integer v)))
     "type declaration")
+(is '@eval-when-compile 1
+    '(eval-when (:compile-toplevel) 1)
+    "eval-when-compile")
+(is '@eval-when-load 1
+    '(eval-when (:load-toplevel) 1)
+    "eval-when-load")
+(is '@eval-when-execute 1
+    '(eval-when (:execute) 1)
+    "eval-when-execute")
+(is '@eval-always 1
+    '(eval-when (:compile-toplevel :load-toplevel :execute) 1)
+    "eval-always")
 
 (finalize)

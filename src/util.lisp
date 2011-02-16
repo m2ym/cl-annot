@@ -1,15 +1,19 @@
 (in-package :cl-user)
 
-(defpackage cl-annot
+(defpackage cl-annot.util
   (:use :cl)
-  (:nicknames :annot)
-  (:export :function-name
+  (:nicknames :annot.util)
+  (:export :with-gensyms
+           :function-name
            :method-function
            :method-name
            :reference-symbol
-           :enable-annot-syntax))
+           :macrop
+           :macroexpand-some
+           :should-expand-p
+           :annotation-macro))
 
-(in-package :cl-annot)
+(in-package :cl-annot.util)
 
 (defmacro with-gensyms (vars &body body)
   `(let ,(loop for var in vars collect `(,var ',(gensym)))
@@ -67,47 +71,19 @@
         form
         (macroexpand-some new-form))))
 
-(defun export* (object)
-  "Export the reference symbol of OBJECT."
-  (export (reference-symbol object)))
+(defun should-expand-p (symbol)
+  "Return non-nil if the macro of SYMBOL should be expaneded on
+read-time."
+  (and (symbolp symbol)
+       (get symbol 'should-expand-p)))
 
-(defmacro ignore* (vars)
-  "Shorthand of (DECLARE (IGNORE ...))."
-  (if (listp vars)
-      `(declare (ignore ,@vars))
-      `(declare (ignore ,vars))))
+(defun (setf should-expand-p) (bool symbol)
+  (setf (get symbol 'should-expand-p) bool))
 
-(defmacro type* (type-specs)
-  "Shothand of (DECLARE (TYPE ...))."
-  `(declare (type ,type-specs)))
+(defun annotation-macro (symbol)
+  "Return the real annotation macro of SYMBOL."
+  (and (symbolp symbol)
+       (get symbol 'annotation-macro)))
 
-(defun read-annotation (stream)
-  "Read an annotation from STREAM."
-  (let ((annot (read stream t nil t)))
-    (case annot
-      (cl:export 'export*)
-      (cl:ignore (values 'ignore* t))
-      (cl:type (values 'type* t))
-      (t annot))))
-
-(defun annot-syntax-reader (stream char)
-  (declare (ignore char))
-  (multiple-value-bind (annot expand-p)
-      (read-annotation stream)
-    (let* ((arg (read stream t nil t))
-           (form `(,annot ,arg)))
-      (if (macrop annot)
-          (if expand-p
-              (macroexpand-some form)
-              form)
-          (with-gensyms (v)
-            `(let ((,v ,arg))
-               (,annot ,v) ,v))))))
-
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun %enable-annot-syntax ()
-    (set-macro-character #\@ #'annot-syntax-reader)))
-
-(defmacro enable-annot-syntax ()
-  '(eval-when (:compile-toplevel :load-toplevel :execute)
-    (%enable-annot-syntax)))
+(defun (setf annotation-macro) (macro symbol)
+  (setf (get symbol 'annotation-macro) macro))

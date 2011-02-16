@@ -9,4 +9,11 @@
   :version "0.1"
   :author "Tomohiro Matsuyama"
   :license "LLGPL"
-  :components ((:file "annot")))
+  :components
+  ((:module "src"
+    :serial t
+    :components
+    ((:file "util")
+     (:file "std")
+     (:file "eval-when")
+     (:file "annot")))))
