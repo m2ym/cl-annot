@@ -6,85 +6,103 @@
   (:export :function-name
            :method-function
            :method-name
-           :value-symbol
+           :reference-symbol
            :enable-annot-syntax))
 
 (in-package :cl-annot)
 
 (defmacro with-gensyms (vars &body body)
-  `(let ,(loop for var in vars
-               collect `(,var ',(gensym)))
+  `(let ,(loop for var in vars collect `(,var ',(gensym)))
      ,@body))
 
 (defun function-name (function)
-  "Return the symbol of the FUNCTOIN."
+  "Return the symbol of FUNCTION."
   #+sbcl (slot-value function 'sb-pcl::name)
+  #+cmu (slot-value function 'pcl::name)
   #+ccl (slot-value function 'ccl::name)
   #+allegro (slot-value function 'excl::name)
   #+clisp (slot-value function 'clos::$name)
   #+(or ecl lispworks) (slot-value function 'clos::name)
-  #-(or sbcl ccl allegro clisp ecl lispworks) (error "method-name is not supported"))
+  #-(or sbcl cmu ccl allegro clisp ecl lispworks)
+  (error "FUNCTION-NAME is not supported"))
 
 (defun method-function (method)
-  "Return the generic function of the METHOD."
+  "Return the generic function of METHOD."
   #+sbcl (slot-value method 'sb-pcl::%generic-function)
-  #+ccl (slot-value method 'generic-function)
+  #+(or cmu ccl) (slot-value method 'generic-function)
   #+allegro (slot-value method 'generic-function)
   #+clisp (slot-value method 'clos::$gf)
   #+(or ecl lispworks) (slot-value method 'generic-function)
-  #-(or sbcl ccl allegro clisp ecl lispworks) (error "method-function is not supported"))
+  #-(or sbcl cmu ccl allegro clisp ecl lispworks)
+  (error "METHOD-FUNCTION is not supported"))
 
 (defun method-name (method)
-  "Return the symbol of the METHOD."
+  "Return the symbol of METHOD."
   (function-name (method-function method)))
 
-(defun value-symbol (value)
-  "Return the symbol of the VALUE. VALUE can be symbol, class, and
-method."
-  (etypecase value
+(defun reference-symbol (object)
+  "Return the reference symbol of OBJECT."
+  (etypecase object
     (cons
-     (if (eq (car value) 'cl:setf)
-         (cadr value)
-         (error "Unknown cons format for exporting")))
-    (symbol value)
-    (class (class-name value))
-    (standard-generic-function (function-name value))
-    (standard-method (method-name value))))
+     (if (eq (car object) 'cl:setf)
+         (cadr object)
+         (error "No cons reference symbol")))
+    (symbol object)
+    (class (class-name object))
+    (standard-generic-function (function-name object))
+    (standard-method (method-name object))))
 
-(defun export* (value)
-  (export (value-symbol value)))
+(defun macrop (object)
+  "Return non-nil if OBJECT is a macro."
+  (and (symbolp object)
+       (macro-function object)
+       t))
 
-(defmacro ignore* (var)
-  (if (listp var)
-      `(declare (ignore ,@var))
-      `(declare (ignore ,var))))
+(defun macroexpand-some (form)
+  "Expand FORM while it has a valid form."
+  (multiple-value-bind (new-form expanded-p)
+      (macroexpand-1 form)
+    (if (or (not expanded-p)
+            (null new-form))
+        form
+        (macroexpand-some new-form))))
 
-(defun read-annotator (stream)
-  "Read annotator specification from the STREAM."
-  (let ((annotator (read stream t nil t)))
-    (case annotator
+(defun export* (object)
+  "Export the reference symbol of OBJECT."
+  (export (reference-symbol object)))
+
+(defmacro ignore* (vars)
+  "Shorthand of (DECLARE (IGNORE ...))."
+  (if (listp vars)
+      `(declare (ignore ,@vars))
+      `(declare (ignore ,vars))))
+
+(defmacro type* (type-specs)
+  "Shothand of (DECLARE (TYPE ...))."
+  `(declare (type ,type-specs)))
+
+(defun read-annotation (stream)
+  "Read an annotation from STREAM."
+  (let ((annot (read stream t nil t)))
+    (case annot
       (cl:export 'export*)
       (cl:ignore (values 'ignore* t))
-      (t annotator))))
+      (cl:type (values 'type* t))
+      (t annot))))
 
 (defun annot-syntax-reader (stream char)
   (declare (ignore char))
-  (multiple-value-bind (annotator expand)
-      (read-annotator stream)
+  (multiple-value-bind (annot expand-p)
+      (read-annotation stream)
     (let* ((arg (read stream t nil t))
-           (form `(,annotator ,arg)))
-      (if (or ;; macro form
-              (and (symbolp annotator)
-                   (macro-function annotator))
-              ;; lambda special form
-              (and (consp annotator)
-                   (eq (car annotator) 'cl:lambda)))
-          (if expand
-              (macroexpand form)
+           (form `(,annot ,arg)))
+      (if (macrop annot)
+          (if expand-p
+              (macroexpand-some form)
               form)
           (with-gensyms (v)
             `(let ((,v ,arg))
-               (,annotator ,v) ,v))))))
+               (,annot ,v) ,v))))))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun %enable-annot-syntax ()
