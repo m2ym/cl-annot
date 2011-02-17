@@ -4,57 +4,16 @@
   (:use :cl)
   (:nicknames :annot.util)
   (:export :with-gensyms
-           :function-name
-           :method-function
-           :method-name
-           :reference-symbol
            :macrop
            :macroexpand-some
            :should-expand-p
-           :annotation-macro))
+           :annotation))
 
 (in-package :cl-annot.util)
 
 (defmacro with-gensyms (vars &body body)
   `(let ,(loop for var in vars collect `(,var ',(gensym)))
      ,@body))
-
-(defun function-name (function)
-  "Return the symbol of FUNCTION."
-  #+sbcl (slot-value function 'sb-pcl::name)
-  #+cmu (slot-value function 'pcl::name)
-  #+ccl (slot-value function 'ccl::name)
-  #+allegro (slot-value function 'excl::name)
-  #+clisp (slot-value function 'clos::$name)
-  #+(or ecl lispworks) (slot-value function 'clos::name)
-  #-(or sbcl cmu ccl allegro clisp ecl lispworks)
-  (error "FUNCTION-NAME is not supported"))
-
-(defun method-function (method)
-  "Return the generic function of METHOD."
-  #+sbcl (slot-value method 'sb-pcl::%generic-function)
-  #+(or cmu ccl) (slot-value method 'generic-function)
-  #+allegro (slot-value method 'generic-function)
-  #+clisp (slot-value method 'clos::$gf)
-  #+(or ecl lispworks) (slot-value method 'generic-function)
-  #-(or sbcl cmu ccl allegro clisp ecl lispworks)
-  (error "METHOD-FUNCTION is not supported"))
-
-(defun method-name (method)
-  "Return the symbol of METHOD."
-  (function-name (method-function method)))
-
-(defun reference-symbol (object)
-  "Return the reference symbol of OBJECT."
-  (etypecase object
-    (cons
-     (if (eq (car object) 'cl:setf)
-         (cadr object)
-         (error "No cons reference symbol")))
-    (symbol object)
-    (class (class-name object))
-    (standard-generic-function (function-name object))
-    (standard-method (method-name object))))
 
 (defun macrop (object)
   "Return non-nil if OBJECT is a macro."
@@ -63,7 +22,7 @@
        t))
 
 (defun macroexpand-some (form)
-  "Expand FORM while it has a valid form."
+  "Expand FORM while it has a normal form."
   (multiple-value-bind (new-form expanded-p)
       (macroexpand-1 form)
     (if (or (not expanded-p)
@@ -71,19 +30,18 @@
         form
         (macroexpand-some new-form))))
 
-(defun should-expand-p (symbol)
-  "Return non-nil if the macro of SYMBOL should be expaneded on
-read-time."
-  (and (symbolp symbol)
-       (get symbol 'should-expand-p)))
+(defun should-expand-p (annot)
+  "Return non-nil if ANNOT should be expanded on read-time."
+  (and (symbolp annot)
+       (get annot 'should-expand-p)))
 
-(defun (setf should-expand-p) (bool symbol)
-  (setf (get symbol 'should-expand-p) bool))
+(defun (setf should-expand-p) (expand-p annot)
+  (setf (get annot 'should-expand-p) expand-p))
 
-(defun annotation-macro (symbol)
-  "Return the real annotation macro of SYMBOL."
-  (and (symbolp symbol)
-       (get symbol 'annotation-macro)))
+(defun annotation (annot)
+  "Return the real annotation of ANNOT."
+  (and (symbolp annot)
+       (get annot 'annotation)))
 
-(defun (setf annotation-macro) (macro symbol)
-  (setf (get symbol 'annotation-macro) macro))
+(defun (setf annotation) (real annot)
+  (setf (get annot 'annotation) real))

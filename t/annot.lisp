@@ -12,50 +12,66 @@
 
 (enable-annot-syntax)
 
-(is (function-name (defgeneric g ()))
-    'g
-    "function-name")
-(ok (method-function (defmethod m ()))
-    "method-function")
-(is (method-name (defmethod m ()))
-    'm
-    "method-name")
-(is (reference-symbol (defun (setf f) ()))
-    'f
-    "reference-symbol for setf-function")
-(is (reference-symbol 'f)
-    'f
-    "reference-symbol for symbol")
-(is (reference-symbol (defclass c () ()))
-    'c
-    "reference-symbol for class")
-(is (reference-symbol (defgeneric g ()))
-    'g
-    "reference-symbol for generic-function")
-(is (reference-symbol (defmethod m ()))
-    'm
-    "reference-symbol for method")
+(defun symbol-status (name)
+  (cadr (multiple-value-list (find-symbol (string-upcase name)))))
+
 (is @1+ 1
     1
-    "expression annotation")
+    "expression")
+(is-expand @1+ 1
+           (let (($ 1)) (1+ $) $)
+           "expression expansion")
 (is @or 1
     1
-    "macro annotation")
+    "macro")
+(is '@or 1
+    '(or 1)
+    "macro expansion")
 (is @(lambda (x) (1+ x)) 1
     1
-    "lambda form annotation")
+    "lambda form")
 (is @export (defun x ())
     'x
-    "export annotation")
-(is (cadr (multiple-value-list (find-symbol "X")))
+    "export function")
+(is (symbol-status :x)
     :external
-    "exported?")
+    "function exported?")
+(is @export (defun (setf s) ())
+    's
+    "export setf function")
+(is (symbol-status :s)
+    :external
+    "setf function exported?")
+(is @export (defgeneric g ())
+    'g
+    "export generic function")
+(is (symbol-status :g)
+    :external
+    "generic function exported?")
+(is @export (defmethod m ())
+    'm
+    "export method")
+(is (symbol-status :m)
+    :external
+    "method exported?")
+(is @export (defmethod c ())
+    'c
+    "export class")
+(is (symbol-status :c)
+    :external
+    "class exporteded?")
+(is-expand @export (defun x ())
+           (progn (defun x ()) (export 'x))
+           "export expansion")
 (is '@ignore v
     '(declare (ignore v))
-    "ignore declaration")
+    "ignore")
+(is '@ignorable v
+    '(declare (ignorable v))
+    "ignorable")
 (is '@type (integer v)
     '(declare (type (integer v)))
-    "type declaration")
+    "type")
 (is '@eval-when-compile 1
     '(eval-when (:compile-toplevel) 1)
     "eval-when-compile")

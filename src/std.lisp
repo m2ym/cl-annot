@@ -10,11 +10,18 @@
 
 (in-package :cl-annot.std)
 
-(defun export* (object)
-  "Export the reference symbol of OBJECT."
-  (export (reference-symbol object)))
+(defmacro export* (form)
+  "Export the reference symbol of FORM."
+  (let ((symbol (cadr form)))
+    (if (and (consp symbol)
+             (eq (car symbol) 'setf))
+        (setf symbol (cadr symbol)))
+    `(progn
+       ,form
+       (export ',symbol)
+       ',symbol)))
 (setf (should-expand-p 'export*) t
-      (annotation-macro 'export) 'export*)
+      (annotation 'export) 'export*)
 
 (defmacro ignore* (vars)
   "Shorthand of (DECLARE (IGNORE ...))."
@@ -22,10 +29,18 @@
       `(declare (ignore ,@vars))
       `(declare (ignore ,vars))))
 (setf (should-expand-p 'ignore*) t
-      (annotation-macro 'ignore) 'ignore*)
+      (annotation 'ignore) 'ignore*)
+
+(defmacro ignorable* (vars)
+  "Shorthand of (DECLARE (IGNORABLE ...))."
+  (if (listp vars)
+      `(declare (ignorable ,@vars))
+      `(declare (ignorable ,vars))))
+(setf (should-expand-p 'ignorable*) t
+      (annotation 'ignorable) 'ignorable*)
 
 (defmacro type* (type-specs)
   "Shothand of (DECLARE (TYPE ...))."
   `(declare (type ,type-specs)))
 (setf (should-expand-p 'type*) t
-      (annotation-macro 'type) 'type*)
+      (annotation 'type) 'type*)
