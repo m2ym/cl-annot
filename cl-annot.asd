@@ -13,7 +13,17 @@
   ((:module "src"
     :serial t
     :components
-    ((:file "util")
-     (:file "std")
-     (:file "eval-when")
-     (:file "annot")))))
+    ((:module "main"
+      :serial t
+      :components
+      ((:file "util")
+       (:file "core")
+       (:file "expand")
+       (:file "syntax")
+       (:file "annot")))
+     (:module "lib"
+      :serial t
+      :components
+      ((:file "std")
+       (:file "eval-when")
+       (:file "doc")))))))
