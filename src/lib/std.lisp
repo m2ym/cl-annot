@@ -37,8 +37,8 @@
 (setf (annotation-real 'ignorable) 'ignorable*
       (annotation-inline-p 'ignorable*) t)
 
-(defmacro type* (type-specs)
+(defmacro type* (typespec)
   "Shothand of (DECLARE (TYPE ...))."
-  `(declare (type ,type-specs)))
+  `(declare (type ,@typespec)))
 (setf (annotation-real 'type) 'type*
       (annotation-inline-p 'type*) t)
