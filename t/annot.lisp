@@ -13,17 +13,19 @@
 (defun symbol-status (name)
   (cadr (multiple-value-list (find-symbol (string-upcase name)))))
 
+(defmacro id-macro (x) x)
+
 (is @1+ 1
     2
     "expression")
 (is-expand @1+ 1
            (1+ 1)
            "expression expansion")
-(is @or 1
+(is @id-macro 1
     1
     "macro")
-(is-expand @or 1
-           (or 1)
+(is-expand @id-macro 1
+           1
            "macro expansion")
 (is @export (defun x ())
     'x
@@ -57,8 +59,7 @@
     "class exported?")
 (is (macroexpand '@export (defun x ()))
     '(progn
-      (cl-annot.std:export*
-       (defun x ()))
+      (export 'x)
       (defun x ()))
     "export expansion")
 (is '@ignore v
@@ -71,19 +72,21 @@
     '(declare (type (integer v)))
     "type")
 (is-expand @eval-when-compile 1
-           (eval-when-compile 1)
+           (eval-when (:compile-toplevel) 1)
            "eval-when-compile")
 (is-expand @eval-when-load 1
-           (eval-when-load 1)
+           (eval-when (:load-toplevel) 1)
            "eval-when-load")
 (is-expand @eval-when-execute 1
-           (eval-when-execute 1)
+           (eval-when (:execute) 1)
            "eval-when-execute")
 (is-expand @eval-always 1
-           (eval-always 1)
+           (eval-when (:compile-toplevel
+                       :load-toplevel
+                       :execute) 1)
            "eval-always")
 (is-expand @doc "doc" (defun f () 1)
-           (doc "doc" (defun f () 1))
+           (defun f () "doc" 1)
            "function documentation expansion")
 (is @doc "doc" (defparameter p nil)
     'p
@@ -109,14 +112,23 @@
 (is (documentation 'mac 'function)
     "doc"
     "macro documented?")
-(is @export @doc "doc" (defun x () 1)
-    'x
+(is @export @doc "doc" (defun y () 1)
+    'y
     "export&doc")
-(is (symbol-status :x)
+(is (symbol-status :y)
     :external
     "export&doc exported?")
-(is (documentation 'x 'function)
+(is (documentation 'y 'function)
     "doc"
     "export&doc documented?")
+(is @doc "doc" @export (defun z () 1)
+    'z
+    "doc&export")
+(is (symbol-status :z)
+    :external
+    "doc&export exported?")
+(is (documentation 'z 'function)
+    "doc"
+    "doc&export documented?")
 
 (finalize)

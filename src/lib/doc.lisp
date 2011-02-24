@@ -10,10 +10,13 @@
 (in-package :annot.doc)
 
 (defmacro doc (docstring form)
-  (ecase (definition-type form)
-    ((defvar defparameter defconstant defun defmacro)
-     (destructuring-bind (def name arg . rest)
-         form
-       `(,def ,name ,arg ,docstring ,@rest)))
-    (t (error "Documentation not supported for ~a" form))))
+  (let ((last (progn-last form)))
+    (ecase (definition-type last)
+      ((defvar defparameter defconstant defun defmacro)
+       (destructuring-bind (def name arg . body)
+           last
+         (progn-replace-last
+          `(,def ,name ,arg ,docstring ,@body)
+          form)))
+      (t (error "Documentation not supported: ~a" last)))))
 (setf (annotation-narg 'doc) 2)

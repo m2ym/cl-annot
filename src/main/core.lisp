@@ -3,19 +3,22 @@
 (defpackage cl-annot.core
   (:use :cl)
   (:nicknames annot.core)
-  (:export :real-annotation
+  (:export :annotation-real
            :annotation-narg
-           :toplevel-annotation-p
-           :annotation-expand-p))
+           :annotation-type
+           :annotation-inline-p
+           :annotation-form
+           :annotation-form-p
+           :annotation))
 
 (in-package :annot.core)
 
-(defun real-annotation (annot)
+(defun annotation-real (annot)
   "Return the real annotation of ANNOT."
-  (get annot 'real-annotation))
+  (get annot 'annotation-real))
 
-(defun (setf real-annotation) (real-annot annot)
-  (setf (get annot 'real-annotation) real-annot))
+(defun (setf annotation-real) (real annot)
+  (setf (get annot 'annotation-real) real))
 
 (defun annotation-narg (annot)
   "Return the number of arguments of ANNOT."
@@ -24,16 +27,19 @@
 (defun (setf annotation-narg) (narg annot)
   (setf (get annot 'annotation-narg) narg))
 
-(defun toplevel-annotation-p (annot)
-  "Return non-nil if ANNOT respects of top-level forms."
-  (get annot 'toplevel-annotation-p))
+(defun annotation-inline-p (annot)
+  "Return non-nil if ANNOT should be expanded on read-time."
+  (get annot 'annotation-inline-p))
 
-(defun (setf toplevel-annotation-p) (toplevel-p annot)
-  (setf (get annot 'toplevel-annotation-p) toplevel-p))
+(defun (setf annotation-inline-p) (inline-p annot)
+  (setf (get annot 'annotation-inline-p) inline-p))
 
-(defun annotation-expand-p (annot)
-  "Return non-nil if ANNOT should expand at read-time."
-  (get annot 'annotation-expand-p))
+(defun annotation-form (annot args)
+  "Make an annotation-form with ANNOT and ARGS."
+  `(annotation ,annot ,@args))
 
-(defun (setf annotation-expand-p) (expand-p annot)
-  (setf (get annot 'annotation-expand-p) expand-p))
+(defun annotation-form-p (form)
+  "Return non-nil if FORM is an annotation-form."
+  (and (consp form)
+       (consp (cdr form))
+       (eq (car form) 'annotation)))

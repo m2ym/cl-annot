@@ -12,7 +12,7 @@
 
 (defun read-annotation (stream)
   (let ((annot (read stream t nil t)))
-    (or (real-annotation annot) annot)))
+    (or (annotation-real annot) annot)))
 
 (defun read-annotation-arguments (stream narg)
   (loop repeat narg collect (read stream t nil t)))
@@ -21,11 +21,10 @@
   (declare (ignore char))
   (let* ((annot (read-annotation stream))
          (narg (annotation-narg annot))
-         (args (read-annotation-arguments stream narg))
-         (form `(annotation ,annot ,@args)))
-    (if (annotation-expand-p annot)
-        (macroexpand-some form)
-        form)))
+         (args (read-annotation-arguments stream narg)))
+    (if (annotation-inline-p annot)
+        (expand-annotation annot args)
+        (annotation-form annot args))))
 
 (defun %enable-annot-syntax ()
   (set-macro-character #\@ #'annotation-syntax-reader))

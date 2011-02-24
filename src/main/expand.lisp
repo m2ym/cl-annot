@@ -2,38 +2,24 @@
 
 (defpackage cl-annot.expand
   (:use :cl
-        :annot.core)
+        :annot.core
+        :annot.util)
   (:nicknames :annot.expand)
-  (:export :expand-annotation
-           :annotation))
+  (:export :expand-annotation))
 
 (in-package :annot.expand)
 
-(defun toplevel-annotation-form-p (form)
-  (and (consp form)
-       (consp (cdr form))
-       (eq (car form) 'annotation)
-       (toplevel-annotation-p (cadr form))))
-
-(defun expand-normal-annotation (annot args)
-  `(,annot ,@args))
-
-(defun expand-toplevel-annotation (annot args)
-    (loop with body = `(annotation ,annot ,@args)
-          while (toplevel-annotation-form-p body)
-          collect body into annots
-          do (setf body (car (last body)))
-          finally
-       (return
-         `(progn
-            ,@(loop for annot in annots
-                    collect `(,@(cdr (butlast annot)) ,body))
-            ,body))))
-
 (defun expand-annotation (annot args)
-  (if (toplevel-annotation-p annot)
-      (expand-toplevel-annotation annot args)
-      (expand-normal-annotation annot args)))
+  "Expand ANNOT. ARGS will be expanded prior to this
+form (call-by-value)."
+  (let ((args (mapcar #'expand-annotation-form args)))
+    (macroexpand-some `(,annot ,@args))))
+
+(defun expand-annotation-form (form)
+  "Expand annotation FORM if possible."
+  (if (annotation-form-p form)
+      (expand-annotation (cadr form) (cddr form))
+      form))
 
 (defmacro annotation (annot &rest args)
   "Annotation Expansion Engine."

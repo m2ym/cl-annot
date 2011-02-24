@@ -6,6 +6,8 @@
   (:export :macrop
            :macroexpand-some
            :definition-symbol
+           :progn-last
+           :progn-replace-last
            :definition-type
            :with-gensyms))
 
@@ -18,13 +20,27 @@
        t))
 
 (defun macroexpand-some (form)
-  "Expand FORM while it has a normal form."
+  "Expand FORM once."
   (multiple-value-bind (new-form expanded-p)
       (macroexpand-1 form)
-    (if (or (not expanded-p)
-            (null new-form))
+    (if (or (not expanded-p) (null new-form))
         form
-        (macroexpand-some new-form))))
+        new-form)))
+
+(defun progn-last (progn)
+  "Return the last form of PROGN which should evaluted at last."
+  (if (and (consp progn)
+           (eq (car progn) 'progn))
+      (progn-last (car (last progn)))
+      progn))
+
+(defun progn-replace-last (last progn)
+  "Replace the last form of PROGN with LAST."
+  (if (and (consp progn)
+           (eq (car progn) 'progn))
+      `(,@(butlast progn)
+          ,(progn-replace-last last (car (last progn))))
+      last))
 
 (defun definition-symbol (definition-form)
   "Return the symbol of DEFINITION-FORM."
