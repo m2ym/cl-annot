@@ -69,7 +69,7 @@
     '(declare (ignorable v))
     "ignorable")
 (is '@type (integer v)
-    '(declare (type (integer v)))
+    '(declare (type integer v))
     "type")
 (is-expand @eval-when-compile 1
            (eval-when (:compile-toplevel) 1)
@@ -106,6 +106,13 @@
 (is (documentation 'f 'function)
     "doc"
     "function documented?")
+(let ((m @doc "doc" (defmethod m () 1)))
+  (is-type m
+           'standard-method
+           "method documentation")
+  (is (documentation m t)
+      "doc"
+      "method documented?"))
 (is @doc "doc" (defmacro mac () 1)
     'mac
     "macro documentation")

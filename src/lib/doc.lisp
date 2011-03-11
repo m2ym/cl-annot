@@ -12,7 +12,7 @@
 (defmacro doc (docstring form)
   (let ((last (progn-last form)))
     (ecase (definition-type last)
-      ((defvar defparameter defconstant defun defmacro)
+      ((defvar defparameter defconstant defun defmethod defmacro)
        (destructuring-bind (def name arg . body)
            last
          (progn-replace-last
