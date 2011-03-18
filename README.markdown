@@ -53,6 +53,13 @@ equivalents to:
 
 Annotations help you to write the simple and declarative codes.
 
+Installation
+------------
+
+TODO
+
+* [macro-utils](https://github.com/m2ym/macro-utils)
+
 Usage
 -----
 
@@ -65,10 +72,12 @@ After this code, `@...` syntax can be used.
 Emacs Configuration
 -------------------
 
-If you use Emacs, you may want to hightlight annotations. To do so, write the following code into your `.emacs`:
+If you use Emacs, it is recommended to install `misc/slime-annot.el`
+which contains some features of annotations. After locating
+`misc/slime-annot.el` into your loadpath, write the following code
+into your `.emacs`.
 
-    (defvar cl-annot-face 'highlight)
-    (font-lock-add-keywords 'lisp-mode `(("\\(?:^\\|[^,]\\)\\(@\\(?:\\sw\\|\\s_\\)+\\)" (1 ,cl-annot-face))))
+    (require 'slime-annot)
 
 Standard Annotations
 --------------------
@@ -251,9 +260,9 @@ Be caseful to use feature.
 
 ### Macro: `defannotation`
 
-    defannotation NAME (:alias ALIAS :arity ARITY :inline INLINE) LAMBDA-LIST &body BODY
+    defannotation NAME LAMBDA-LIST (:alias ALIAS :arity ARITY :inline INLINE) &body BODY
 
-`defannotation` macro is a utility for creating annotations. Here is an example:
+`defannotation` is an utility macro for creating annotations. Here is an example:
 
     (defannotation my-annot (x y)
         (:arity 2 :inline t)
