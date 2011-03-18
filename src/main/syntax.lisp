@@ -2,9 +2,9 @@
 
 (defpackage cl-annot.syntax
   (:use :cl
+        :macro-utils
         :annot.core
-        :annot.expand
-        :annot.util)
+        :annot.expand)
   (:nicknames :annot.syntax)
   (:export :enable-annot-syntax))
 

@@ -2,7 +2,7 @@
 
 (defpackage cl-annot.core
   (:use :cl)
-  (:nicknames annot.core)
+  (:nicknames :annot.core)
   (:export :annotation-real
            :annotation-narg
            :annotation-type

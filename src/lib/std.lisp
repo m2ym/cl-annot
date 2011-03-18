@@ -2,8 +2,8 @@
 
 (defpackage cl-annot.std
   (:use :cl
-        :annot.core
-        :annot.util)
+        :macro-utils
+        :annot.core)
   (:nicknames :annot.std)
   (:export :export*
            :ignore*
@@ -14,8 +14,8 @@
 
 (defmacro export* (form)
   "Export the definition symbol of FORM."
-  (let* ((last (progn-last form))
-         (symbol (definition-symbol last)))
+  (let* ((last (progn-form-last form))
+         (symbol (definition-form-symbol last)))
     `(progn
        (export ',symbol)
        ,form)))

@@ -2,8 +2,8 @@
 
 (defpackage cl-annot.expand
   (:use :cl
-        :annot.core
-        :annot.util)
+        :macro-utils
+        :annot.core)
   (:nicknames :annot.expand)
   (:export :expand-annotation))
 
