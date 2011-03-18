@@ -9,7 +9,8 @@
 
 (in-package :annot.doc)
 
-(defmacro doc (docstring form)
+(defannotation doc (docstring form)
+    (:arity 2)
   (let ((last (progn-form-last form)))
     (ecase (definition-form-type last)
       ((defvar defparameter defconstant defun defmethod defmacro)
@@ -19,4 +20,3 @@
           `(,def ,name ,arg ,docstring ,@body)
           form)))
       (t (error "Documentation not supported: ~a" last)))))
-(setf (annotation-arity 'doc) 2)

@@ -5,11 +5,11 @@
   (:nicknames :annot.core)
   (:export :annotation-real
            :annotation-arity
-           :annotation-type
            :annotation-inline-p
            :annotation-form
            :annotation-form-p
-           :annotation))
+           :annotation
+           :defannotation))
 
 (in-package :annot.core)
 
@@ -43,3 +43,13 @@
   (and (consp form)
        (consp (cdr form))
        (eq (car form) 'annotation)))
+
+(defmacro defannotation (name lambda-list attrs &body body)
+  `(progn
+     ,@(if (getf attrs :alias)
+           `((setf (annotation-real ',(getf attrs :alias)) ',name)))
+     ,@(if (getf attrs :arity)
+           `((setf (annotation-arity ',name) ,(getf attrs :arity))))
+     ,@(if (getf attrs :inline)
+           `((setf (annotation-inline-p ',name) t)))
+     (defmacro ,name ,lambda-list ,@body)))

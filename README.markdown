@@ -249,6 +249,16 @@ In some cases, you want annotations to be expanded at read-time. You can do it b
 
 Be caseful to use feature.
 
+### Macro: `defannotation`
+
+    defannotation NAME (:alias ALIAS :arity ARITY :inline INLINE) LAMBDA-LIST &body BODY
+
+`defannotation` macro is a utility for creating annotations. Here is an example:
+
+    (defannotation my-annot (x y)
+        (:arity 2 :inline t)
+      `(+ ,x ,y))
+
 ----
 
 Copyright (C) 2011  Tomohiro Matsuyama <<tomo@cx4a.org>>
