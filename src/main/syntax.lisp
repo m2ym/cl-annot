@@ -14,14 +14,14 @@
   (let ((annot (read stream t nil t)))
     (or (annotation-real annot) annot)))
 
-(defun read-annotation-arguments (stream narg)
-  (loop repeat narg collect (read stream t nil t)))
+(defun read-annotation-arguments (stream arity)
+  (loop repeat arity collect (read stream t nil t)))
 
 (defun annotation-syntax-reader (stream char)
   (declare (ignore char))
   (let* ((annot (read-annotation stream))
-         (narg (annotation-narg annot))
-         (args (read-annotation-arguments stream narg)))
+         (arity (annotation-arity annot))
+         (args (read-annotation-arguments stream arity)))
     (if (annotation-inline-p annot)
         (expand-annotation annot args)
         (annotation-form annot args))))

@@ -4,7 +4,7 @@
   (:use :cl)
   (:nicknames :annot.core)
   (:export :annotation-real
-           :annotation-narg
+           :annotation-arity
            :annotation-type
            :annotation-inline-p
            :annotation-form
@@ -20,12 +20,12 @@
 (defun (setf annotation-real) (real annot)
   (setf (get annot 'annotation-real) real))
 
-(defun annotation-narg (annot)
+(defun annotation-arity (annot)
   "Return the number of arguments of ANNOT."
-  (or (get annot 'annotation-narg) 1))
+  (or (get annot 'annotation-arity) 1))
 
-(defun (setf annotation-narg) (narg annot)
-  (setf (get annot 'annotation-narg) narg))
+(defun (setf annotation-arity) (arity annot)
+  (setf (get annot 'annotation-arity) arity))
 
 (defun annotation-inline-p (annot)
   "Return non-nil if ANNOT should be expanded on read-time."

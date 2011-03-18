@@ -19,4 +19,4 @@
           `(,def ,name ,arg ,docstring ,@body)
           form)))
       (t (error "Documentation not supported: ~a" last)))))
-(setf (annotation-narg 'doc) 2)
+(setf (annotation-arity 'doc) 2)

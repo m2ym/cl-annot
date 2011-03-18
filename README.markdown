@@ -234,7 +234,7 @@ a number of arguments into the annotation symbol like:
     (use-package :annot.core)
     
     (defun my-annot (x y) (+ x y))
-    (setf (annotation-narg 'my-annot) 2)
+    (setf (annotation-arity 'my-annot) 2)
 
 Now you can use this annotation like:
 
