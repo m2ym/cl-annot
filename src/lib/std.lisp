@@ -1,8 +1,6 @@
-(in-package :cl-user)
-
 (defpackage cl-annot.std
   (:use :cl
-        :macro-utils
+        :annot.util
         :annot.core)
   (:nicknames :annot.std)
   (:export :export*

@@ -1,8 +1,6 @@
-(in-package :cl-user)
-
 (defpackage cl-annot.doc
   (:use :cl
-        :macro-utils
+        :annot.util
         :annot.core)
   (:nicknames :annot.doc)
   (:export :doc))

@@ -1,5 +1,3 @@
-(in-package :cl-user)
-
 (defpackage cl-annot.core
   (:use :cl)
   (:nicknames :annot.core)

@@ -1,5 +1,3 @@
-(in-package :cl-user)
-
 (defpackage cl-annot.eval-when
   (:use :cl
         :annot.core)

@@ -9,7 +9,6 @@
   :version "0.1"
   :author "Tomohiro Matsuyama"
   :license "LLGPL"
-  :depends-on (:macro-utils)
   :components
   ((:module "src"
     :serial t
@@ -17,7 +16,8 @@
     ((:module "main"
       :serial t
       :components
-      ((:file "core")
+      ((:file "util")
+       (:file "core")
        (:file "expand")
        (:file "syntax")
        (:file "annot")))

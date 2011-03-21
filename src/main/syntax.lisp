@@ -1,8 +1,6 @@
-(in-package :cl-user)
-
 (defpackage cl-annot.syntax
   (:use :cl
-        :macro-utils
+        :annot.util
         :annot.core
         :annot.expand)
   (:nicknames :annot.syntax)

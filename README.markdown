@@ -53,13 +53,6 @@ equivalents to:
 
 Annotations help you to write the simple and declarative codes.
 
-Installation
-------------
-
-TODO
-
-* [macro-utils](https://github.com/m2ym/macro-utils)
-
 Usage
 -----
 
