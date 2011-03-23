@@ -1,8 +1,7 @@
 (defpackage cl-annot.util
   (:use :cl)
   (:nicknames :annot.util)
-  (:export :with-gensyms
-           :macrop
+  (:export :macrop
            :macroexpand-some
            :progn-form-last
            :progn-form-replace-last
@@ -11,10 +10,6 @@
            :map-slot-specifiers))
 
 (in-package :annot.util)
-
-(defmacro with-gensyms (vars &body body)
-  `(let ,(loop for var in vars collect `(,var ',(gensym)))
-     ,@body))
 
 (defun macrop (symbol)
   "Return non-nil if SYMBOL is a macro."

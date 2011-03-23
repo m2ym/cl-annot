@@ -205,6 +205,22 @@ works as you expected.
 
 This package contains annotations about slots.
 
+#### Annotation: `initarg`
+
+    @initarg SLOT-SPECIFIER
+
+`initarg` embeds `:initarg slot-name` into `SLOT-SPECIFIER`. For
+example,
+
+    (defclass c ()
+         (@initarg
+          (foo)))
+
+is equivalent to
+
+    (defclass c ()
+         ((foo :initarg :foo)))
+
 #### Annotation: `required`
 
     @required SLOT-SPECIFIER
@@ -216,7 +232,7 @@ required criteria of the slot. For example,
          (@required
           (foo :initarg :foo)))
 
-is equirevalent to
+is equivalent to
 
     (defclass c ()
          ((foo :initarg :foo :initform (error ":FOO must be given"))))

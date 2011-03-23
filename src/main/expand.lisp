@@ -11,7 +11,7 @@
   "Expand ANNOT. ARGS will be expanded prior to this
 form (call-by-value)."
   (let ((args (mapcar #'expand-annotation-form args)))
-    (macroexpand-some `(,annot ,@args))))
+    (values (macroexpand-some `(,annot ,@args)))))
 
 (defun expand-annotation-form (form)
   "Expand annotation FORM if possible."

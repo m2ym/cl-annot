@@ -138,6 +138,9 @@
 (is (documentation 'z 'function)
     "doc"
     "@doc and @export documented?")
+(is '@initarg (foo)
+    '(foo :initarg :foo)
+    "@initarg expansion")
 (is '@required (foo :initarg :foo)
     '(foo :initform (error "Must supply :FOO") :initarg :foo)
     "@required expansion")
