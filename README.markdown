@@ -209,7 +209,7 @@ This package contains annotations about slots.
 
     @initarg SLOT-SPECIFIER
 
-`initarg` embeds `:initarg slot-name` into `SLOT-SPECIFIER`. For
+`initarg` embeds `:initarg SLOT-NAME` into `SLOT-SPECIFIER`. For
 example,
 
     (defclass c ()
@@ -239,6 +239,36 @@ is equivalent to
 
 `:initarg` of the slot must be given and `:initform` of the slot must
 be empty on the required slot.
+
+#### Annotation: `readable`
+
+    @readable SLOT-SPECIFIER
+
+`readable` embeds `:reader READER-NAME` into `SLOT-SPECIFIER` where
+`READER-NAME` is `SLOT-NAME` wish suffix `-OF`. For example,
+
+    (defclass c ()
+         (@reader
+          (foo)))
+
+is equivalent to
+
+    (defclass c ()
+         ((foo :reader foo-of)))
+
+#### Annotation: `writable`
+
+    @writable SLOT-SPECIFIER
+
+Same as `readable` annotation except this embeds `:writer WRITER-NAME`
+into `SLOT-SPECIFIER`.
+
+#### Annotation: `accessible`
+
+    @accessible SLOT-SPECIFIER
+
+Same as `reader` annotation except this embeds `:accessor
+ACCESSOR-NAME` into `SLOT-SPECIFIER`.
 
 Writing Annotations
 -------------------

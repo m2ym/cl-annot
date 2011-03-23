@@ -4,7 +4,10 @@
         :annot.core)
   (:nicknames :annot.slot)
   (:export :initarg
-           :required))
+           :required
+           :readable
+           :writable
+           :accessible))
 
 (in-package :annot.slot)
 
@@ -39,3 +42,20 @@
        (setf (getf options :initform)
              `(error ,(format nil "Must supply ~S" (getf options :initarg))))))
     (cons slot-name options)))
+
+(defmacro defaccessor (name type)
+  `(defannotation ,name (slot-specifier)
+       (:inline t)
+     (destructuring-bind (slot-name . options)
+         (if (consp slot-specifier)
+             slot-specifier
+             (list slot-specifier))
+       (if (getf options ,type)
+           (error "~A must not have ~S" slot-name ,type)
+           (setf (getf options ,type)
+                 (intern (format nil "~A-OF" slot-name))))
+       (cons slot-name options))))
+
+(defaccessor readable :reader)
+(defaccessor writable :writer)
+(defaccessor accessible :accessor)
