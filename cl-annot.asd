@@ -26,4 +26,5 @@
       :components
       ((:file "std")
        (:file "eval-when")
-       (:file "doc")))))))
+       (:file "doc")
+       (:file "slot")))))))

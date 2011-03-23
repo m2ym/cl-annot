@@ -201,6 +201,29 @@ Mixture of `export` annotation and `doc` annotation is allowed, means
 
 works as you expected.
 
+### Package: `annot.slot`
+
+This package contains annotations about slots.
+
+#### Annotation: `required`
+
+    @required SLOT-SPECIFIER
+
+`required` embeds `:initform (error ...)` into `SLOT-SPECIFIER` as a
+required criteria of the slot. For example,
+
+    (defclass c ()
+         (@required
+          (foo :initarg :foo)))
+
+is equirevalent to
+
+    (defclass c ()
+         ((foo :initarg :foo :initform (error ":FOO must be given"))))
+
+`:initarg` of the slot must be given and `:initform` of the slot must
+be empty on the required slot.
+
 Writing Annotations
 -------------------
 

@@ -4,7 +4,8 @@
   (:use :cl
         :cl-test-more
         :annot.eval-when
-        :annot.doc))
+        :annot.doc
+        :annot.slot))
 
 (in-package :cl-annot-test)
 
@@ -29,13 +30,13 @@
            "macro expansion")
 (is @export (defun x ())
     'x
-    "export function")
+    "@export function")
 (is (symbol-status :x)
     :external
     "function exported?")
 (is @export (defun (setf s) ())
     '(setf s)
-    "export setf function")
+    "@export setf function")
 (is (symbol-status :s)
     :external
     "setf function exported?")
@@ -61,81 +62,84 @@
     '(progn
       (export 'x)
       (defun x ()))
-    "export expansion")
+    "@export expansion")
 (is '@ignore v
     '(declare (ignore v))
-    "ignore")
+    "@ignore")
 (is '@ignorable v
     '(declare (ignorable v))
-    "ignorable")
+    "@ignorable")
 (is '@type (integer v)
     '(declare (type integer v))
-    "type")
+    "@type")
 (is-expand @eval-when-compile 1
            (eval-when (:compile-toplevel) 1)
-           "eval-when-compile")
+           "@eval-when-compile")
 (is-expand @eval-when-load 1
            (eval-when (:load-toplevel) 1)
-           "eval-when-load")
+           "@eval-when-load")
 (is-expand @eval-when-execute 1
            (eval-when (:execute) 1)
-           "eval-when-execute")
+           "@eval-when-execute")
 (is-expand @eval-always 1
            (eval-when (:compile-toplevel
                        :load-toplevel
                        :execute) 1)
-           "eval-always")
+           "@eval-always")
 (is-expand @doc "doc" (defun f () 1)
            (defun f () "doc" 1)
            "function documentation expansion")
 (is @doc "doc" (defparameter p nil)
     'p
-    "parameter documentation")
+    "@doc parameter")
 (is (documentation 'p 'variable)
     "doc"
     "parameter documented?")
 (is @doc "doc" (defconstant k nil)
     'k
-    "constant documentation")
+    "@doc constant")
 (is (documentation 'k 'variable)
     "doc"
     "constant documented?")
 (is @doc "doc" (defun f () 1)
     'f
-    "function documentation")
+    "@doc function")
 (is (documentation 'f 'function)
     "doc"
     "function documented?")
 (let ((m @doc "doc" (defmethod m () 1)))
   (is-type m
            'standard-method
-           "method documentation")
+           "@doc method")
   (is (documentation m t)
       "doc"
       "method documented?"))
 (is @doc "doc" (defmacro mac () 1)
     'mac
-    "macro documentation")
+    "@doc macro")
 (is (documentation 'mac 'function)
     "doc"
     "macro documented?")
 (is @export @doc "doc" (defun y () 1)
     'y
-    "export&doc")
+    "@export and @doc")
 (is (symbol-status :y)
     :external
-    "export&doc exported?")
+    "@export and @doc exported?")
 (is (documentation 'y 'function)
     "doc"
-    "export&doc documented?")
+    "@export and @doc documented?")
 (is @doc "doc" @export (defun z () 1)
     'z
-    "doc&export")
+    "@doc and @export")
 (is (symbol-status :z)
     :external
-    "doc&export exported?")
+    "@doc and @export exported?")
 (is (documentation 'z 'function)
     "doc"
-    "doc&export documented?")
+    "@doc and @export documented?")
+(is '@required (foo :initarg :foo)
+    '(foo :initform (error "Must supply :FOO") :initarg :foo)
+    "@required expansion")
 
 (finalize)
