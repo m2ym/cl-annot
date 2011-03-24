@@ -53,7 +53,7 @@
        (if (getf options ,type)
            (error "~A must not have ~S" slot-name ,type)
            (setf (getf options ,type)
-                 (intern (format nil "~A-OF" slot-name))))
+                 (intern (string slot-name))))
        (cons slot-name options))))
 
 (defaccessor readable :reader)
