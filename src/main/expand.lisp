@@ -4,7 +4,6 @@
         :annot.core)
   (:nicknames :annot.expand)
   (:export :expand-annotation))
-
 (in-package :annot.expand)
 
 (defun expand-annotation (annot args)

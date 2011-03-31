@@ -6,7 +6,6 @@
            :eval-when-load
            :eval-when-execute
            :eval-always))
-
 (in-package :annot.eval-when)
 
 (defmacro eval-when-compile (&body body)

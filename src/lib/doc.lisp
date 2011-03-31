@@ -4,7 +4,6 @@
         :annot.core)
   (:nicknames :annot.doc)
   (:export :doc))
-
 (in-package :annot.doc)
 
 (defannotation doc (docstring form)

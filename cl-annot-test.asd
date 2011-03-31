@@ -7,8 +7,6 @@
 
 (defsystem cl-annot-test
   :depends-on (:cl-test-more :cl-annot)
-  :components
-  ((:module "t"
-    :serial t
-    :components
-    ((:file "annot")))))
+  :components ((:module "t"
+                :serial t
+                :components ((:file "annot")))))

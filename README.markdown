@@ -201,74 +201,107 @@ Mixture of `export` annotation and `doc` annotation is allowed, means
 
 works as you expected.
 
+### Package: `annot.class`
+
+This package contains annotations about classes.
+
+#### Annotation: `metaclass`
+
+    @metaclass METACLASS CLASS-DEFINITION-FORM
+
+`metaclass` embeds `(:metaclsas METACLASS)` into class-options of
+`CLASS-DEFINITION-FORM`. For example,
+
+    @metaclass persistent-class
+    (defclass foo ()
+         ())
+
+is equivalent to
+
+    (defclass foo ()
+         ()
+      (:metaclass persistent-class))
+
+#### Annotation: `export-slots`
+
+    @export-slots CLASS-DEFINITION-FORM
+
+`export-slots` adds `(export ...)` form for slots of
+`CLASS-DEFINITION-FORM`. For example,
+
+    @export-slots
+    (defclass foo ()
+         (bar baz))
+
+is equivalent to
+
+    (progn
+      (export '(bar baz))
+      (defclass foo ()
+         (bar baz)))
+
+#### Annotation: `export-accessors`
+
+    @export-accessors CLASS-DEFINITION-FORM
+
+`export-accessors` adds `(export ...)` form for accessors
+(i.e. readers, writers and accessors) of `CLASS-DEFINITION-FORM`. For
+example,
+
+    @export-accessors
+    (defclass foo ()
+         ((bar :reader bar-of)
+          (bax :writer bax-of)
+          (baz :accessor baz-of)))
+
+is equivalent to
+
+    (progn
+      (export '(bar-of bax-of baz-of))
+      (defclass foo ()
+         ((bar :reader bar-of)
+          (bax :writer bax-of)
+          (baz :accessor baz-of))))
+
 ### Package: `annot.slot`
 
 This package contains annotations about slots.
 
-#### Annotation: `initarg`
+#### Annotation: `optional`
 
-    @initarg SLOT-SPECIFIER
+    @optional INITFORM SLOT-SPECIFIER
 
-`initarg` embeds `:initarg SLOT-NAME` into `SLOT-SPECIFIER`. For
-example,
+`optional` embeds `:initarg SLOT-NAME` and `:initform INITFORM` into
+`SLOT-SPECIFIER`. For example,
 
     (defclass c ()
-         (@initarg
-          (foo)))
+         (@optional nil
+          foo))
 
 is equivalent to
 
     (defclass c ()
-         ((foo :initarg :foo)))
+         ((foo :initarg :foo
+               :initform nil)))
 
 #### Annotation: `required`
 
     @required SLOT-SPECIFIER
 
-`required` embeds `:initform (error ...)` into `SLOT-SPECIFIER` as a
-required criteria of the slot. For example,
+`required` embeds `:initarg SLOT-NAME` and `:initform
+(annot.slot:required-argument SLOT-NAME)` into `SLOT-SPECIFIER` so
+that `MAKE-INSTANCE` will raise errors when no argument for the slot
+given. For example,
 
     (defclass c ()
          (@required
-          (foo :initarg :foo)))
+          foo))
 
 is equivalent to
 
     (defclass c ()
-         ((foo :initarg :foo :initform (error ":FOO must be given"))))
-
-`:initarg` of the slot must be given and `:initform` of the slot must
-be empty on the required slot.
-
-#### Annotation: `readable`
-
-    @readable SLOT-SPECIFIER
-
-`readable` embeds `:reader READER-NAME` into `SLOT-SPECIFIER` where
-`READER-NAME` is `SLOT-NAME` wish suffix `-OF`. For example,
-
-    (defclass c ()
-         (@reader
-          (foo)))
-
-is equivalent to
-
-    (defclass c ()
-         ((foo :reader foo-of)))
-
-#### Annotation: `writable`
-
-    @writable SLOT-SPECIFIER
-
-Same as `readable` annotation except this embeds `:writer WRITER-NAME`
-into `SLOT-SPECIFIER`.
-
-#### Annotation: `accessible`
-
-    @accessible SLOT-SPECIFIER
-
-Same as `reader` annotation except this embeds `:accessor
-ACCESSOR-NAME` into `SLOT-SPECIFIER`.
+         ((foo :initarg :foo
+               :initform (annot.slot:required-argument :foo))))
 
 Writing Annotations
 -------------------

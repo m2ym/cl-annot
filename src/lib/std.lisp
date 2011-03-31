@@ -7,7 +7,6 @@
            :ignore*
            :ignorable*
            :type*))
-
 (in-package :annot.std)
 
 (defannotation export* (form)
@@ -21,19 +20,19 @@
 
 (defannotation ignore* (vars)
     (:alias ignore :inline t)
-  "Shorthand of (DECLARE (IGNORE ...))."
+  "Shorthand for (DECLARE (IGNORE ...))."
   (if (listp vars)
       `(declare (ignore ,@vars))
       `(declare (ignore ,vars))))
 
 (defannotation ignorable* (vars)
     (:alias ignorable :inline t)
-  "Shorthand of (DECLARE (IGNORABLE ...))."
+  "Shorthand for (DECLARE (IGNORABLE ...))."
   (if (listp vars)
       `(declare (ignorable ,@vars))
       `(declare (ignorable ,vars))))
 
 (defannotation type* (typespec)
     (:alias type :inline t)
-  "Shothand of (DECLARE (TYPE ...))."
+  "Shothand for (DECLARE (TYPE ...))."
   `(declare (type ,@typespec)))

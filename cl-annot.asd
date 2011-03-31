@@ -9,22 +9,19 @@
   :version "0.1"
   :author "Tomohiro Matsuyama"
   :license "LLGPL"
-  :components
-  ((:module "src"
-    :serial t
-    :components
-    ((:module "main"
-      :serial t
-      :components
-      ((:file "util")
-       (:file "core")
-       (:file "expand")
-       (:file "syntax")
-       (:file "annot")))
-     (:module "lib"
-      :serial t
-      :components
-      ((:file "std")
-       (:file "eval-when")
-       (:file "doc")
-       (:file "slot")))))))
+  :components ((:module "src"
+                :serial t
+                :components ((:module "main"
+                              :serial t
+                              :components ((:file "utils")
+                                           (:file "core")
+                                           (:file "expand")
+                                           (:file "syntax")
+                                           (:file "annot")))
+                             (:module "lib"
+                              :serial t
+                              :components ((:file "std")
+                                           (:file "eval-when")
+                                           (:file "doc")
+                                           (:file "class")
+                                           (:file "slot")))))))

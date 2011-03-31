@@ -5,6 +5,7 @@
         :cl-test-more
         :annot.eval-when
         :annot.doc
+        :annot.class
         :annot.slot))
 
 (in-package :cl-annot-test)
@@ -138,20 +139,35 @@
 (is (documentation 'z 'function)
     "doc"
     "@doc and @export documented?")
-(is '@initarg (foo)
-    '(foo :initarg :foo)
-    "@initarg expansion")
-(is '@required (foo :initarg :foo)
-    '(foo :initform (error "Must supply :FOO") :initarg :foo)
-    "@required expansion")
-(is '@readable (foo)
-    '(foo :reader foo)
-    "@readable expansion")
-(is '@writable (foo)
-    '(foo :writer foo)
-    "@writable expansion")
-(is '@accessible (foo)
-    '(foo :accessor foo)
-    "@accessible expansion")
+(is-expand @metaclass persistent-class (defclass c () ())
+           (defclass c () () (:metaclass persistent-class))
+           "@metaclass expansion")
+(is-expand @export-slots (defclass c () (a b c))
+           (progn (export '(a b c)) (defclass c () (a b c)))
+           "@export-slots expansion")
+(is-expand @export-accessors
+           (defclass c ()
+                ((a :reader a-of)
+                 (b :writer b-of)
+                 (c :accessor c-of)))
+           (progn
+             (export '(a-of b-of c-of))
+             (defclass c ()
+                ((a :reader a-of)
+                 (b :writer b-of)
+                 (c :accessor c-of))))
+           "@export-accessors expansion")
+(is '@required foo
+    '(foo :initform (annot.slot::required-argument :foo) :initarg :foo)
+    "@required expansion 1")
+(is '@required (foo :initarg :bar)
+    '(foo :initform (annot.slot::required-argument :bar) :initarg :bar)
+    "@required expansion 2")
+(is '@optional nil foo
+    '(foo :initform nil :initarg :foo)
+    "@optional expansion 1")
+(is '@optional nil (foo :initarg :bar)
+    '(foo :initform nil :initarg :bar)
+    "@optional expansion 2")
 
 (finalize)

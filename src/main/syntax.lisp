@@ -5,7 +5,6 @@
         :annot.expand)
   (:nicknames :annot.syntax)
   (:export :enable-annot-syntax))
-
 (in-package :annot.syntax)
 
 (defun read-annotation (stream)

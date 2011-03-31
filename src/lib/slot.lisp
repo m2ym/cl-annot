@@ -3,59 +3,36 @@
         :annot.util
         :annot.core)
   (:nicknames :annot.slot)
-  (:export :initarg
-           :required
-           :readable
-           :writable
-           :accessible))
-
+  (:export :optional
+           :required))
 (in-package :annot.slot)
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun make-keyword (string)
-    (intern (string string) :keyword)))
+(defun required-argument (name)
+  (error "Must supply ~S" name))
 
-(defannotation initarg (slot-specifier)
-    (:inline t)
-  (destructuring-bind (slot-name . options)
-      (if (consp slot-specifier)
-          slot-specifier
-          (list slot-specifier))
-    (if (getf options :initarg)
-        (error "~S must not have :initarg" slot-name)
-        (setf (getf options :initarg)
-              (make-keyword slot-name)))
-    (cons slot-name options)))
+(defmacro def-slot-annotation (name args &body body)
+  (with-gensyms (slot-specifier)
+    `(defannotation ,name ,(append args (list slot-specifier))
+         (:inline t :arity ,(1+ (length args)))
+       (destructuring-bind (slot-name . slot-options)
+           (if (consp ,slot-specifier)
+               ,slot-specifier
+               (list ,slot-specifier))
+         ,@body
+         (cons slot-name slot-options)))))
 
-(defannotation required (slot-specifier)
-    (:inline t)
-  (destructuring-bind (slot-name . options)
-      (if (consp slot-specifier)
-          slot-specifier
-          (list slot-specifier))
-    (cond
-      ((not (eq (getf options :initform 'not-found) 'not-found))
-       (error "Required slot ~A must not have :initform" slot-name))
-      ((eq (getf options :initarg 'not-found) 'not-found)
-       (error "Required slot ~A must have :initarg" slot-name))
-      (t
-       (setf (getf options :initform)
-             `(error ,(format nil "Must supply ~S" (getf options :initarg))))))
-    (cons slot-name options)))
+(def-slot-annotation optional (init-form)
+  (unless (plist-member slot-options :initarg)
+    (setf (getf slot-options :initarg)
+          (make-keyword slot-name)))
+  (unless (plist-member slot-options :initform)
+    (setf (getf slot-options :initform) init-form)))
 
-(defmacro defaccessor (name type)
-  `(defannotation ,name (slot-specifier)
-       (:inline t)
-     (destructuring-bind (slot-name . options)
-         (if (consp slot-specifier)
-             slot-specifier
-             (list slot-specifier))
-       (if (getf options ,type)
-           (error "~A must not have ~S" slot-name ,type)
-           (setf (getf options ,type)
-                 (intern (string slot-name))))
-       (cons slot-name options))))
-
-(defaccessor readable :reader)
-(defaccessor writable :writer)
-(defaccessor accessible :accessor)
+(def-slot-annotation required ()
+  (when (plist-member slot-options :initform)
+    (error "Required slot ~A must not have :initform" slot-name))
+  (unless (plist-member slot-options :initarg)
+    (setf (getf slot-options :initarg)
+          (make-keyword slot-name)))
+  (setf (getf slot-options :initform)
+        `(required-argument ,(getf slot-options :initarg))))

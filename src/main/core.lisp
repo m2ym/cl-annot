@@ -8,7 +8,6 @@
            :annotation-form-p
            :annotation
            :defannotation))
-
 (in-package :annot.core)
 
 (defun annotation-real (annot)
