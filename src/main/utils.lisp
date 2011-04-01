@@ -7,6 +7,7 @@
            ;; Macros
            :macrop
            :macroexpand-some
+           :macroexpand-until-normal-form
            ;; Progns
            :progn-form-last
            :progn-form-replace-last
@@ -47,39 +48,64 @@
         (values form nil)
         (values new-form expanded-p))))
 
+(defun macroexpand-until-normal-form (form)
+  "Expand FORM until it brecomes normal-form."
+  (if (and (consp form)
+           (macrop (car form))
+           (let ((package (symbol-package (car form))))
+             (and package
+                  (member package
+                          (list (find-package :cl)
+                                #+clisp (find-package :clos))))))
+      (values form nil)
+      (multiple-value-bind (new-form expanded-p)
+          (macroexpand-1 form)
+        (if (or (not expanded-p) (null new-form))
+            (values form nil)
+            (values (macroexpand-until-normal-form new-form) t)))))
+
 (defun progn-form-last (progn-form)
-  "Return the last form of PROGN-FORM which should evaluated at last."
-  (if (and (consp progn-form)
-           (eq (car progn-form) 'progn))
-      (progn-form-last (car (last progn-form)))
-      progn-form))
+  "Return the last form of PROGN-FORM which should evaluated at
+last. If macro forms seen, the macro forms will be expanded using
+MACROEXPAND-UNTIL-NORMAL-FORM."
+  (let ((progn-form (macroexpand-until-normal-form progn-form)))
+    (if (and (consp progn-form)
+             (eq (car progn-form) 'progn))
+        (progn-form-last (car (last progn-form)))
+        progn-form)))
 
 (defun progn-form-replace-last (last progn-form)
   "Replace the last form of PROGN-FORM with LAST. If LAST is a
 function, the function will be called with the last form and used for
-replacing."
-  (if (and (consp progn-form)
-           (eq (car progn-form) 'progn))
-      `(,@(butlast progn-form)
-          ,(progn-form-replace-last last (car (last progn-form))))
-      (if (functionp last)
-          (funcall last progn-form)
-          last)))
+replacing. If macro forms seen, the macro forms will be expanded using
+MACROEXPAND-UNTIL-NORMAL-FORM."
+  (let ((progn-form (macroexpand-until-normal-form progn-form)))
+    (if (and (consp progn-form)
+             (eq (car progn-form) 'progn))
+        `(,@(butlast progn-form)
+            ,(progn-form-replace-last last (car (last progn-form))))
+        (if (functionp last)
+            (funcall last progn-form)
+            last))))
 
 (defun definition-form-symbol (definition-form)
   "Return the symbol of DEFINITION-FORM."
-  ;; TODO
-  (cadr definition-form))
+  (let* ((form (progn-form-last definition-form))
+         (symbol (cadr form)))
+    (if (and (consp symbol)
+             (eq (car symbol) 'setf))
+        (cadr symbol)
+        symbol)))
 
 (defun definition-form-type (definition-form)
   "Return the type of DEFINITION-FORM."
-  ;; TODO
-  (car definition-form))
+  (let* ((form (progn-form-last definition-form))
+         (type (car form)))
+    type))
 
 (defun replace-function-body (function function-definition-form)
   "Replace the body of FUNCTION-DEFINITION-FORM by calling FUNCTION
 with name, lambda-list and the body as arguments."
-  ;; TODO
   (progn-form-replace-last
    (lambda (function-definition-form)
      (destructuring-bind (type name lambda-list . body)

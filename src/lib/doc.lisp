@@ -11,12 +11,13 @@
 @annotation (:arity 2)
 (defmacro doc (docstring definition-form)
   "Add DOCSTRING documentation for DEFINITION-FORM."
-  (let ((last (progn-form-last definition-form)))
-    (ecase (definition-form-type last)
-      ((defvar defparameter defconstant defun defmethod defmacro)
-       (destructuring-bind (def name arg . body)
-           last
-         (progn-form-replace-last
-          `(,def ,name ,arg ,docstring ,@body)
-          definition-form)))
-      (t (error "Documentation not supported: ~a" last)))))
+  (progn-form-replace-last
+   (lambda (definition-form)
+     (case (definition-form-type definition-form)
+       ((defvar defparameter defconstant defun defmethod defmacro)
+        (destructuring-bind (def name arg . body)
+            definition-form
+          `(,def ,name ,arg ,docstring ,@body)))
+       (t (error "Documentation not supported: ~a"
+                 definition-form))))
+   definition-form))

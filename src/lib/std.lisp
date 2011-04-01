@@ -13,11 +13,12 @@
 @annotation (:alias export)
 (defmacro export* (definition-form)
   "Export the definition symbol of DEFINITION-FORM."
-  (let ((name (definition-form-symbol
-                  (progn-form-last definition-form))))
-    `(progn
-       (export ',name)
-       ,definition-form)))
+  (let ((name (definition-form-symbol definition-form)))
+    (if name
+        `(progn
+           (export ',name)
+           ,definition-form)
+        definition-form)))
 
 @annotation (:alias ignore :inline t)
 (defmacro ignore* (vars)

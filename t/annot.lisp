@@ -17,6 +17,8 @@
 
 (defmacro id-macro (x) x)
 
+(defmacro fun () `(defun f ()))
+
 (is @1+ 1
     2
     "expression")
@@ -63,7 +65,12 @@
     '(progn
       (export 'x)
       (defun x ()))
-    "@export expansion")
+    "@export expansion 1")
+(is (macroexpand '@export (fun))
+    '(progn
+      (export 'f)
+      (fun))
+    "@export expansion 2")
 (is '@ignore v
     '(declare (ignore v))
     "@ignore")
@@ -108,13 +115,12 @@
 (is (documentation 'f 'function)
     "doc"
     "function documented?")
-(let ((m @doc "doc" (defmethod m () 1)))
-  (is-type m
-           'standard-method
-           "@doc method")
-  (is (documentation m t)
-      "doc"
-      "method documented?"))
+(is-type @doc "doc" (defmethod m () 1)
+         'standard-method
+         "@doc method")
+(is (documentation (find-method (symbol-function 'm) nil ()) t)
+    "doc"
+    "method documented?")
 (is @doc "doc" (defmacro mac () 1)
     'mac
     "@doc macro")
