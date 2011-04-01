@@ -2,6 +2,9 @@
   (:use :cl
         :annot.util
         :annot.api)
+  (:import-from :alexandria
+                :make-keyword
+                :with-gensyms)
   (:nicknames :annot.slot))
 (in-package :annot.slot)
 (annot:enable-annot-syntax)

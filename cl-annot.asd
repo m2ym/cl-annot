@@ -9,6 +9,7 @@
   :version "0.1"
   :author "Tomohiro Matsuyama"
   :license "LLGPL"
+  :depends-on (:alexandria)
   :components ((:module "src"
                 :serial t
                 :components ((:module "main"

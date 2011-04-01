@@ -2,11 +2,9 @@
   (:nicknames :annot.util)
   (:use :cl)
   (:export ;; General
-           :make-keyword
            :plist-member
            :plist-get-all
            ;; Macros
-           :with-gensyms
            :macrop
            :macroexpand-some
            ;; Progns
@@ -24,10 +22,6 @@
            :get-class-option))
 (in-package :annot.util)
 
-(defun make-keyword (string)
-  "Make keyword with STRING. STRING can be a string or a symbol."
-  (intern (string string) :keyword))
-
 (defun plist-member (plist prop)
   "Return t if PLIST contains PROP as a property."
   (let ((undef '#:undef))
@@ -38,12 +32,6 @@
   (loop for (name value) on plist by #'cddr
         if (string= prop name)
           collect value))
-
-(defmacro with-gensyms (vars &body body)
-  "My with-gensyms."
-  `(let ,(loop for var in vars
-               collect `(,var ',(gensym (string var))))
-     ,@body))
 
 (defun macrop (symbol)
   "Return non-nil if SYMBOL is a macro."
