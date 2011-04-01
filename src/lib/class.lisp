@@ -1,22 +1,21 @@
 (defpackage cl-annot.class
+  (:nicknames :annot.class)
   (:use :cl
         :annot.util
-        :annot.core)
-  (:nicknames :annot.class)
-  (:export :metaclass
-           :export-slots
-           :export-accessors))
+        :annot.api))
 (in-package :annot.class)
+(annot:enable-annot-syntax)
 
-(defannotation metaclass (metaclass class-definition-form)
-    (:arity 2)
+@export
+@annotation (:arity 2)
+(defmacro metaclass (metaclass class-definition-form)
   (if (get-class-option :metaclass class-definition-form)
       (error ":metaclass is not empty")
       (append class-definition-form
               `((:metaclass ,metaclass)))))
 
-(defannotation export-slots (class-definition-form)
-    ()
+@export
+(defmacro export-slots (class-definition-form)
   (loop for slot-specifier in (slot-specifiers class-definition-form)
         for slot = (if (consp slot-specifier)
                        (car slot-specifier)
@@ -30,8 +29,8 @@
               ,class-definition-form)
            class-definition-form))))
 
-(defannotation export-accessors (class-definition-form)
-    ()
+@export
+(defmacro export-accessors (class-definition-form)
   (loop for slot-specifier in (slot-specifiers class-definition-form)
         for slot-options = (when (consp slot-specifier) (cdr slot-specifier))
         if slot-options

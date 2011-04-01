@@ -1,13 +1,12 @@
 (defpackage cl-annot.core
-  (:use :cl)
   (:nicknames :annot.core)
+  (:use :cl)
   (:export :annotation-real
            :annotation-arity
            :annotation-inline-p
            :annotation-form
            :annotation-form-p
-           :annotation
-           :defannotation))
+           :%annotation))
 (in-package :annot.core)
 
 (defun annotation-real (annot)
@@ -33,20 +32,10 @@
 
 (defun annotation-form (annot args)
   "Make an annotation-form with ANNOT and ARGS."
-  `(annotation ,annot ,@args))
+  `(%annotation ,annot ,@args))
 
 (defun annotation-form-p (form)
   "Return non-nil if FORM is an annotation-form."
   (and (consp form)
        (consp (cdr form))
-       (eq (car form) 'annotation)))
-
-(defmacro defannotation (name lambda-list attrs &body body)
-  `(progn
-     ,@(if (getf attrs :alias)
-           `((setf (annotation-real ',(getf attrs :alias)) ',name)))
-     ,@(if (getf attrs :arity)
-           `((setf (annotation-arity ',name) ,(getf attrs :arity))))
-     ,@(if (getf attrs :inline)
-           `((setf (annotation-inline-p ',name) t)))
-     (defmacro ,name ,lambda-list ,@body)))
+       (eq (car form) '%annotation)))

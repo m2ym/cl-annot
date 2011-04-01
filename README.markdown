@@ -363,6 +363,17 @@ Be caseful to use feature.
         (:arity 2 :inline t)
       `(+ ,x ,y))
 
+### Annotation: `annotation`
+
+    annotation (:alias ALIAS :arity ARITY :inline INLINE) FUNCTION-DEFINITION-FORM
+
+`annotation` is an annotation for creating annotations in a way of
+`defannotation`. Here is an example:
+
+    @annotation (:arity 2 :inline t)
+    (defmacro my-annot (x y)
+      `(+ ,x ,y))
+
 ----
 
 Copyright (C) 2011  Tomohiro Matsuyama <<tomo@cx4a.org>>

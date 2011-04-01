@@ -1,10 +1,9 @@
 (defpackage cl-annot.syntax
+  (:nicknames :annot.syntax)
   (:use :cl
-        :annot.util
         :annot.core
         :annot.expand)
-  (:nicknames :annot.syntax)
-  (:export :enable-annot-syntax))
+  (:export :annotation-syntax-reader))
 (in-package :annot.syntax)
 
 (defun read-annotation (stream)
@@ -22,10 +21,3 @@
     (if (annotation-inline-p annot)
         (expand-annotation annot args)
         (annotation-form annot args))))
-
-(defun %enable-annot-syntax ()
-  (set-macro-character #\@ #'annotation-syntax-reader))
-
-(defmacro enable-annot-syntax ()
-  '(eval-when (:compile-toplevel :load-toplevel :execute)
-    (%enable-annot-syntax)))

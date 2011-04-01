@@ -1,38 +1,39 @@
 (defpackage cl-annot.std
+  (:nicknames :annot.std)
   (:use :cl
         :annot.util
-        :annot.core)
-  (:nicknames :annot.std)
+        :annot.api)
   (:export :export*
            :ignore*
            :ignorable*
            :type*))
 (in-package :annot.std)
+(annot:enable-annot-syntax)
 
-(defannotation export* (form)
-    (:alias export)
-  "Export the definition symbol of FORM."
-  (let* ((last (progn-form-last form))
-         (symbol (definition-form-symbol last)))
+@annotation (:alias export)
+(defmacro export* (definition-form)
+  "Export the definition symbol of DEFINITION-FORM."
+  (let ((name (definition-form-symbol
+                  (progn-form-last definition-form))))
     `(progn
-       (export ',symbol)
-       ,form)))
+       (export ',name)
+       ,definition-form)))
 
-(defannotation ignore* (vars)
-    (:alias ignore :inline t)
+@annotation (:alias ignore :inline t)
+(defmacro ignore* (vars)
   "Shorthand for (DECLARE (IGNORE ...))."
   (if (listp vars)
       `(declare (ignore ,@vars))
       `(declare (ignore ,vars))))
 
-(defannotation ignorable* (vars)
-    (:alias ignorable :inline t)
+@annotation (:alias ignorable :inline t)
+(defmacro ignorable* (vars)
   "Shorthand for (DECLARE (IGNORABLE ...))."
   (if (listp vars)
       `(declare (ignorable ,@vars))
       `(declare (ignorable ,vars))))
 
-(defannotation type* (typespec)
-    (:alias type :inline t)
+@annotation (:alias type :inline t)
+(defmacro type* (typespec)
   "Shothand for (DECLARE (TYPE ...))."
   `(declare (type ,@typespec)))

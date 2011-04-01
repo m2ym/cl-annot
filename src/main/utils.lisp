@@ -1,6 +1,6 @@
 (defpackage cl-annot.util
-  (:use :cl)
   (:nicknames :annot.util)
+  (:use :cl)
   (:export ;; General
            :make-keyword
            :plist-member

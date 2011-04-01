@@ -1,8 +1,8 @@
 (defpackage cl-annot.expand
+  (:nicknames :annot.expand)
   (:use :cl
         :annot.util
         :annot.core)
-  (:nicknames :annot.expand)
   (:export :expand-annotation))
 (in-package :annot.expand)
 
@@ -18,6 +18,6 @@ form (call-by-value)."
       (expand-annotation (cadr form) (cddr form))
       form))
 
-(defmacro annotation (annot &rest args)
+(defmacro %annotation (annot &rest args)
   "Annotation Expansion Engine."
   (expand-annotation annot args))

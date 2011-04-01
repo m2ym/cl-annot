@@ -1,7 +1,10 @@
 (defpackage cl-annot
-  (:use :cl
-        :annot.core
-        :annot.syntax)
   (:nicknames :annot)
-  (:export :enable-annot-syntax
-           :defannotation))
+  (:use :cl)
+  (:import-from :annot.api
+                :defannotation
+                :annotation
+                :enable-annot-syntax)
+  (:export :defannotation
+           :annotation
+           :enable-annot-syntax))
