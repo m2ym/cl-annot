@@ -1,13 +1,14 @@
 (defpackage cl-annot.slot
+  (:nicknames :annot.slot)
   (:use :cl
         :annot.util
-        :annot.api)
+        :annot.helper)
   (:import-from :alexandria
                 :make-keyword
                 :with-gensyms)
-  (:nicknames :annot.slot))
+  (:export :optional
+           :required))
 (in-package :annot.slot)
-(annot:enable-annot-syntax)
 
 (defun required-argument (name)
   (error "Must supply ~S" name))
@@ -23,7 +24,6 @@
          ,@body
          (cons slot-name slot-options)))))
 
-@export
 (def-slot-annotation optional (init-form)
   (unless (plist-member slot-options :initarg)
     (setf (getf slot-options :initarg)
@@ -31,7 +31,6 @@
   (unless (plist-member slot-options :initform)
     (setf (getf slot-options :initform) init-form)))
 
-@export
 (def-slot-annotation required ()
   (when (plist-member slot-options :initform)
     (error "Required slot ~A must not have :initform" slot-name))

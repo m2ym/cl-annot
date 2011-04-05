@@ -18,7 +18,7 @@
                                            (:file "core")
                                            (:file "expand")
                                            (:file "syntax")
-                                           (:file "api")
+                                           (:file "helper")
                                            (:file "annot")))
                              (:module "lib"
                               :serial t

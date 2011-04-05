@@ -3,7 +3,9 @@
   (:use :cl
         :annot.core
         :annot.expand)
-  (:export :annotation-syntax-reader))
+  (:export :annotation-syntax-reader
+           :enable-annot-syntax
+           :syntax))
 (in-package :annot.syntax)
 
 (defun read-annotation (stream)
@@ -21,3 +23,15 @@
     (if (annotation-inline-p annot)
         (expand-annotation annot args)
         (annotation-form annot args))))
+
+(defun %enable-annot-syntax ()
+  (setf *readtable* (copy-readtable))
+  (set-macro-character #\@ #'annotation-syntax-reader))
+
+(defmacro enable-annot-syntax ()
+  '(eval-when (:compile-toplevel :load-toplevel :execute)
+    (%enable-annot-syntax)))
+
+;; TODO use syntax:defsyntax
+(defvar syntax
+    `((:macro-character #\@ ,#'annotation-syntax-reader)))

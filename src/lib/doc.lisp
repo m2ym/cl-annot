@@ -2,14 +2,12 @@
   (:nicknames :annot.doc)
   (:use :cl
         :annot.util
-        :annot.api)
+        :annot.helper)
   (:export :doc))
 (in-package :annot.doc)
-(annot:enable-annot-syntax)
 
-@export
-@annotation (:arity 2)
-(defmacro doc (docstring definition-form)
+(defannotation doc (docstring definition-form)
+    (:arity 2)
   "Add DOCSTRING documentation for DEFINITION-FORM."
   (progn-form-replace-last
    (lambda (definition-form)

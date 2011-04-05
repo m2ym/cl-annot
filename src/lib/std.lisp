@@ -2,16 +2,15 @@
   (:nicknames :annot.std)
   (:use :cl
         :annot.util
-        :annot.api)
+        :annot.helper)
   (:export :export*
            :ignore*
            :ignorable*
            :type*))
 (in-package :annot.std)
-(annot:enable-annot-syntax)
 
-@annotation (:alias export)
-(defmacro export* (definition-form)
+(defannotation export* (definition-form)
+    (:alias export)
   "Export the definition symbol of DEFINITION-FORM."
   (let ((name (definition-form-symbol definition-form)))
     (if name
@@ -20,21 +19,21 @@
            ,definition-form)
         definition-form)))
 
-@annotation (:alias ignore :inline t)
-(defmacro ignore* (vars)
+(defannotation ignore* (vars)
+    (:alias ignore :inline t)
   "Shorthand for (DECLARE (IGNORE ...))."
   (if (listp vars)
       `(declare (ignore ,@vars))
       `(declare (ignore ,vars))))
 
-@annotation (:alias ignorable :inline t)
-(defmacro ignorable* (vars)
+(defannotation ignorable* (vars)
+    (:alias ignorable :inline t)
   "Shorthand for (DECLARE (IGNORABLE ...))."
   (if (listp vars)
       `(declare (ignorable ,@vars))
       `(declare (ignorable ,vars))))
 
-@annotation (:alias type :inline t)
-(defmacro type* (typespec)
+(defannotation type* (typespec)
+    (:alias type :inline t)
   "Shothand for (DECLARE (TYPE ...))."
   `(declare (type ,@typespec)))

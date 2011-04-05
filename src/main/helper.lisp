@@ -1,13 +1,12 @@
-(defpackage cl-annot.api
-  (:nicknames :annot.api)
+(defpackage cl-annot.helper
+  (:nicknames :annot.helper)
   (:use :cl
         :annot.util
         :annot.core
         :annot.syntax)
   (:export :defannotation
-           :annotation
-           :enable-annot-syntax))
-(in-package :annot.api)
+           :annotation))
+(in-package :annot.helper)
 
 (defun set-annotation-options (name options)
   (when (getf options :alias)
@@ -29,10 +28,3 @@
     `(progn
        (set-annotation-options ',name ',options)
        ,function-definition-form)))
-
-(defun %enable-annot-syntax ()
-  (set-macro-character #\@ #'annotation-syntax-reader))
-
-(defmacro enable-annot-syntax ()
-  '(eval-when (:compile-toplevel :load-toplevel :execute)
-    (%enable-annot-syntax)))
