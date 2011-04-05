@@ -5,7 +5,7 @@
         :annot.expand)
   (:export :annotation-syntax-reader
            :enable-annot-syntax
-           :syntax))
+           :annot-syntax))
 (in-package :annot.syntax)
 
 (defun read-annotation (stream)
@@ -33,5 +33,5 @@
     (%enable-annot-syntax)))
 
 ;; TODO use syntax:defsyntax
-(defvar syntax
+(defvar annot-syntax
     `((:macro-character #\@ ,#'annotation-syntax-reader)))

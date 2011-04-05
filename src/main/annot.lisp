@@ -5,9 +5,9 @@
                 :defannotation
                 :annotation)
   (:import-from :annot.syntax
-                :syntax
+                :annot-syntax
                 :enable-annot-syntax)
   (:export :defannotation
            :annotation
-           :syntax
+           :annot-syntax
            :enable-annot-syntax))
