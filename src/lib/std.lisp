@@ -6,7 +6,9 @@
   (:export :export*
            :ignore*
            :ignorable*
-           :type*))
+           :type*
+           :optimize*
+           :inline*))
 (in-package :annot.std)
 
 (defannotation export* (definition-form)
@@ -33,7 +35,26 @@
       `(declare (ignorable ,@vars))
       `(declare (ignorable ,vars))))
 
-(defannotation type* (typespec)
-    (:alias type :inline t)
-  "Shothand for (DECLARE (TYPE ...))."
-  `(declare (type ,@typespec)))
+(defannotation type* (typespec name)
+    (:alias type :arity 2 :inline t)
+  "Shorthand for (DECLARE (TYPE ...))."
+  (if (consp name)
+      ;; TODO
+      ()
+      `(declare (type ,typespec ,name))))
+
+(defannotation optimize* (quality)
+    (:alias optimize :inline t)
+  "Shorthand for (DECLARE (OPTIMIZE ...))."
+  `(declare (optimize ,quality)))
+
+(defannotation inline* (name)
+    (:alias inline :inline t)
+  "Shorthand for (DECLARE (INLINE ...))."
+  (let ((symbol (definition-form-symbol name))
+        (type (definition-form-type name)))
+    (if (and symbol
+             (member type
+                     '(defun defmethod)))
+        `(proclaim (inline ,symbol))
+        `(declare (inline ,name)))))

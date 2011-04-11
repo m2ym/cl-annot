@@ -122,16 +122,54 @@ Same as `ignore` annotation except that this is equivalent to
 
 #### Annotation: `type`
 
-    @type TYPESPEC
+    @type TYPESPEC NAME
 
 `type` is a macro which is equivalent to `(declare (type ...))`
 form. For example,
 
-    @type (integer v)
+    @type integer v
 
 is equivalent to
 
     (declare (type integer v))
+
+#### Annotation: `optimize`
+
+    @optimize QUALITY
+
+`optimize` is a macro which is equivalent to `(declare (optimize
+...))` form. For example,
+
+    @optimize (speed 3)
+
+is equivalent to
+
+    (declare (optimize (speed 3)))
+
+#### Annotation: `inline`
+
+    @inline NAME
+
+`inline` is a macro which is equivalent to `(proclaim (inline ...))`
+or `(declare (inline ...))` form. If NAME is just a symbol,
+declaration will be used. If NAME is a definition form, proclamation
+will be used. For example,
+
+    @inline f
+
+is equivalent to
+
+    (declare (inline f))
+
+And
+
+    @inline
+    (defun f () ...)
+
+is equivalent to
+
+    (proclam (inline f))
+    (defun f () ...)
 
 ### Package: `annot.eval-when`
 

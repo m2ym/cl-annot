@@ -77,9 +77,18 @@
 (is '@ignorable v
     '(declare (ignorable v))
     "@ignorable")
-(is '@type (integer v)
+(is '@type integer v
     '(declare (type integer v))
     "@type")
+(is '@optimize (speed 3)
+    '(declare (optimize (speed 3)))
+    "@optimize")
+(is '@inline f
+    '(declare (inline f))
+    "@inline symbol")
+(is '@inline (defun f ())
+    '(proclaim (inline f))
+    "@inline defun")
 (is-expand @eval-when-compile 1
            (eval-when (:compile-toplevel) 1)
            "@eval-when-compile")
