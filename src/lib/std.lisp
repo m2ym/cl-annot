@@ -56,5 +56,7 @@
     (if (and symbol
              (member type
                      '(defun defmethod)))
-        `(proclaim (inline ,symbol))
+        `(progn
+           (declaim (inline ,symbol))
+           ,name)
         `(declare (inline ,name)))))

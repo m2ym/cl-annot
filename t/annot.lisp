@@ -87,7 +87,9 @@
     '(declare (inline f))
     "@inline symbol")
 (is '@inline (defun f ())
-    '(proclaim (inline f))
+    '(progn
+      (declaim (inline f))
+      (defun f ()))
     "@inline defun")
 (is-expand @eval-when-compile 1
            (eval-when (:compile-toplevel) 1)
