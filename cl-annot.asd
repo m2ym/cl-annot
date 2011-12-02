@@ -9,6 +9,7 @@
   :version "0.1"
   :author "Tomohiro Matsuyama"
   :license "LLGPL"
+  :description "Python-like Annotation Syntax for Common Lisp"
   :depends-on (:alexandria)
   :components ((:module "src"
                 :serial t
