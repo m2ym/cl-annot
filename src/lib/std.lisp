@@ -6,9 +6,14 @@
   (:export :export*
            :ignore*
            :ignorable*
+		   :dynamic-extent*
+		   :declaration*
+		   :special*
            :type*
+           :ftype*
            :optimize*
-           :inline*))
+           :inline*
+           :notinline*))
 (in-package :annot.std)
 
 (defannotation export* (definition-form)
@@ -21,19 +26,38 @@
            ,definition-form)
         definition-form)))
 
-(defannotation ignore* (vars)
-    (:alias ignore :inline t)
-  "Shorthand for (DECLARE (IGNORE ...))."
-  (if (listp vars)
-      `(declare (ignore ,@vars))
-      `(declare (ignore ,vars))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; simple one-or-more variables
+;;;; 
 
-(defannotation ignorable* (vars)
-    (:alias ignorable :inline t)
-  "Shorthand for (DECLARE (IGNORABLE ...))."
+(defun %declare-list-or-symbol (vars sym)
   (if (listp vars)
-      `(declare (ignorable ,@vars))
-      `(declare (ignorable ,vars))))
+      `(declare (,sym ,@vars))
+      `(declare (,sym ,vars))))
+
+(defannotation ignore* (vars) (:alias ignore :inline t)
+  "Shorthand for (DECLARE (IGNORE ...))."
+  (%declare-list-or-symbol vars 'ignore))
+
+(defannotation ignorable* (vars) (:alias ignorable :inline t)
+  "Shorthand for (DECLARE (IGNORABLE ...))."
+  (%declare-list-or-symbol vars 'ignorable))
+
+(defannotation dynamic-extent* (vars) (:alias dynamic-extent :inline t)
+  "Shorthand for (DECLARE (DYNAMIC-EXTENT ...))."
+  (%declare-list-or-symbol vars 'dynamic-extent))
+
+(defannotation declaration* (vars) (:alias declaration :inline t)
+  "Shorthand for (DECLARE (DECLARATION ...))."
+  (%declare-list-or-symbol vars 'declaration))
+
+(defannotation special* (vars) (:alias special :inline t)
+  "Shorthand for (DECLARE (SPECIAL ...))."
+  (%declare-list-or-symbol vars 'special))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; others
+;;;;
 
 (defannotation type* (typespec name)
     (:alias type :arity 2 :inline t)
@@ -42,6 +66,14 @@
       ;; TODO
       ()
       `(declare (type ,typespec ,name))))
+
+(defannotation ftype* (typespec name)
+    (:alias ftype :arity 2 :inline t)
+  "Shorthand for (DECLARE (FTYPE ...))."
+  (if (consp name)
+      ;; TODO
+      ()
+      `(declare (ftype ,typespec ,name))))
 
 (defannotation optimize* (quality)
     (:alias optimize :inline t)
@@ -60,3 +92,18 @@
            (declaim (inline ,symbol))
            ,name)
         `(declare (inline ,name)))))
+
+(defannotation notinline* (name)
+    (:alias notinline :inline t)
+  "Shorthand for (DECLARE (NOTINLINE ...))."
+  (let ((symbol (definition-form-symbol name))
+        (type (definition-form-type name)))
+    (if (and symbol
+             (member type
+                     '(defun defmethod)))
+        `(progn
+           (declaim (notinline ,symbol))
+           ,name)
+        `(declare (notinline ,name)))))
+
+
