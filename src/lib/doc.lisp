@@ -13,22 +13,33 @@
    (lambda (definition-form)
      (case (definition-form-type definition-form)
        ((defvar defparameter defconstant defun defmethod defmacro
-				deftype)
+				deftype define-compiler-macro)
         (destructuring-bind (def name arg . body)
             definition-form
           `(,def ,name ,arg ,docstring ,@body)))
-	   ((defclass)
+	   ((defstruct)
+		(destructuring-bind (def name-and-options . slots)
+            definition-form
+          `(,def ,name-and-options ,docstring ,@slots)))
+	   ((defclass define-condition)
         (destructuring-bind (def name supers slots . opts)
             definition-form
+		  (pushnew `(:documentation ,docstring)
+				   opts :key #'car)
           `(,def ,name ,supers ,slots
-				 ,@(cons `(:documentation ,docstring)
-						 opts))))
+				 ,@opts)))
 	   ((defgeneric)
         (destructuring-bind (def name args . opts)
             definition-form
+		  (pushnew `(:documentation ,docstring)
+					 opts :key #'car)
 		  `(,def ,name ,args
-			 ,@(cons `(:documentation ,docstring)
-					 opts))))
+			 ,@opts)))
        (t (error "Documentation not supported: ~a"
                  definition-form))))
    definition-form))
+
+;; todo: 
+;; define-compiler-macro 	define-condition
+;; define-method-combination 	define-modify-macro
+;; define-setf-expander 	define-symbol-macro
