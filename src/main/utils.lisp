@@ -91,12 +91,13 @@ MACROEXPAND-UNTIL-NORMAL-FORM."
 (defun definition-form-symbol (definition-form)
   "Return the symbol of DEFINITION-FORM."
   (let* ((form (progn-form-last definition-form))
-         (symbol (when (consp form)
-                   (cadr form))))
-    (if (and (consp symbol)
-             (eq (car symbol) 'setf))
-        (cadr symbol)
-        symbol)))
+         (second (when (consp form)
+                   (second form))))
+    (if (consp second)
+	(cond 
+	  ((eq (car second) 'setf) (second second))
+	  (t (first second))) ; fix for the long-form of defstruct 
+        second)))
 
 (defun definition-form-type (definition-form)
   "Return the type of DEFINITION-FORM."
