@@ -91,6 +91,8 @@
     :external
     "structure exported?")
 
+
+
 ;;;; ignore and other compilation-related declarations
 
 (is '@ignore v
@@ -202,31 +204,72 @@
 
 (is-expand @export-slots (defstruct s a b c)
            (progn (export '(a b c)) (defstruct s a b c))
-           "@export-slots expansion to the structure")
+           "@export-slots expansion for defstruct")
 (is-expand @export-accessors
            (defstruct s a b c)
            (progn
              (export '(s-a s-b s-c))
              (defstruct s a b c))
-           "@export-accessors expansion to the structure")
+           "@export-accessors expansion for defstruct")
 (is-expand @export-accessors
            (defstruct (s (:conc-name abya)) a b c)
            (progn
              (export '(abyaa abyab abyac))
              (defstruct (s (:conc-name abya)) a b c))
-           "@export-accessors expansion to the structure")
+           "@export-accessors expansion for defstruct")
 (is-expand @export-accessors
            (defstruct (s (:conc-name)) a b c)
            (progn
              (export '(a b c))
              (defstruct (s (:conc-name)) a b c))
-           "@export-accessors expansion to the structure")
+           "@export-accessors expansion for defstruct")
 (is-expand @export-accessors
            (defstruct (s :conc-name) a b c)
            (progn
              (export '(a b c))
              (defstruct (s :conc-name) a b c))
-           "@export-accessors expansion to the structure")
+           "@export-accessors expansion for defstruct")
+
+;;;; constructor
+
+(is-expand @export-constructors
+           (defstruct s a b c)
+           (progn
+             (export '(make-s))
+             (defstruct s a b c))
+           "@export-constructors expansion for defstruct")
+(is-expand @export-constructors
+           (defstruct (s (:constructor abya)) a b c)
+           (progn
+             (export '(abya))
+             (defstruct (s (:constructor abya)) a b c))
+           "@export-constructors expansion for defstruct")
+(is-expand @export-constructors
+           (defstruct (s (:constructor abya a c)
+			 (:constructor abya2 a b c)) a b c)
+           (progn
+             (export '(abya abya2))
+             (defstruct (s (:constructor abya a c)
+			   (:constructor abya2 a b c)) a b c))
+           "@export-constructors expansion for defstruct")
+(is-expand @export-constructors
+           (defstruct (s (:constructor)) a b c)
+           (progn
+             (export '(make-s))
+             (defstruct (s (:constructor)) a b c))
+           "@export-constructors expansion for defstruct")
+(is-expand @export-constructors
+           (defstruct (s :constructor) a b c)
+           (progn
+             (export '(make-s))
+             (defstruct (s :constructor)) a b c)
+           "@export-constructors expansion for defstruct")
+(is-expand @export-constructors
+           (defstruct (s (:constructor nil)) a b c)
+           (defstruct (s (:constructor nil)) a b c)             
+           "@export-constructors expansion for defstruct, no constructor")
+
+
 
 (is '@required foo
     '(foo :initform (annot.slot::required-argument :foo) :initarg :foo)
