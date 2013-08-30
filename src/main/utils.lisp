@@ -65,7 +65,7 @@
             (values (macroexpand-until-normal-form new-form) t)))))
 
 (defun progn-form-last (progn-form)
-  "Return the last form of PROGN-FORM which should evaluated at
+  "Return the last form of PROGN-FORM which should be evaluated at
 last. If macro forms seen, the macro forms will be expanded using
 MACROEXPAND-UNTIL-NORMAL-FORM."
   (let ((progn-form (macroexpand-until-normal-form progn-form)))
@@ -125,7 +125,9 @@ with name, lambda-list and the body as arguments."
 
 (defun slot-specifiers (class-definition-form)
   "Return class-specifiers of CLASS-DEFINITION-FORM."
-  (nth 3 (progn-form-last class-definition-form)))
+  (case (first class-definition-form)
+    (defclass (nth 3 (progn-form-last class-definition-form)))
+    (defstruct (nthcdr 2 (progn-form-last class-definition-form)))))
 
 (defun replace-slot-specifiers (function class-definition-form)
   "Replace slot-specifiers of CLASS-DEFINITION-FORM with FUNCTION. The

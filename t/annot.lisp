@@ -19,6 +19,8 @@
 
 (defmacro fun () `(defun f ()))
 
+;;;; core
+
 (is @1+ 1
     2
     "expression")
@@ -31,6 +33,9 @@
 (is-expand @id-macro 1
            1
            "macro expansion")
+
+;;;; exporting
+
 (is @export (defun x ())
     'x
     "@export function")
@@ -71,6 +76,23 @@
       (export 'f)
       (fun))
     "@export expansion 2")
+
+
+(is-type @export (defstruct s ())
+         'symbol
+         "export structure")
+(is (symbol-status :s)
+    :external
+    "structure exported?")
+(is-type @export (defstruct (s2 (:constructor make-s2)))
+         'symbol
+         "export structure with a long form")
+(is (symbol-status :s2)
+    :external
+    "structure exported?")
+
+;;;; ignore and other compilation-related declarations
+
 (is '@ignore v
     '(declare (ignore v))
     "@ignore")
@@ -105,6 +127,9 @@
                        :load-toplevel
                        :execute) 1)
            "@eval-always")
+
+;;;; doc
+
 (is-expand @doc "doc" (defun f () 1)
            (defun f () "doc" 1)
            "function documentation expansion")
@@ -174,6 +199,35 @@
                  (b :writer b-of)
                  (c :accessor c-of))))
            "@export-accessors expansion")
+
+(is-expand @export-slots (defstruct s a b c)
+           (progn (export '(a b c)) (defstruct s a b c))
+           "@export-slots expansion to the structure")
+(is-expand @export-accessors
+           (defstruct s a b c)
+           (progn
+             (export '(s-a s-b s-c))
+             (defstruct s a b c))
+           "@export-accessors expansion to the structure")
+(is-expand @export-accessors
+           (defstruct (s (:conc-name abya)) a b c)
+           (progn
+             (export '(abyaa abyab abyac))
+             (defstruct (s (:conc-name abya)) a b c))
+           "@export-accessors expansion to the structure")
+(is-expand @export-accessors
+           (defstruct (s (:conc-name)) a b c)
+           (progn
+             (export '(a b c))
+             (defstruct (s (:conc-name)) a b c))
+           "@export-accessors expansion to the structure")
+(is-expand @export-accessors
+           (defstruct (s :conc-name) a b c)
+           (progn
+             (export '(a b c))
+             (defstruct (s :conc-name) a b c))
+           "@export-accessors expansion to the structure")
+
 (is '@required foo
     '(foo :initform (annot.slot::required-argument :foo) :initarg :foo)
     "@required expansion 1")
