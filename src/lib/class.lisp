@@ -12,7 +12,7 @@
   (:import-from :alexandria
 		:ensure-list
 		:curry :rcurry :compose
-		:if-let :when-let))
+		:if-let :when-let :symbolicate))
 (in-package :annot.class)
 
 (defannotation metaclass (metaclass class-definition-form)
@@ -74,17 +74,14 @@
       (second conc-name)
       (if (find :conc-name options)
 	  nil
-	  (concatenate-symbols (first options) '-)))))
-
-(defun concatenate-symbols (a b)
-  (intern (format nil "~a~a" a b)))
+	  (symbolicate (first options) '-)))))
 
 (defun get-accessors-in-defstruct (class-definition-form)
   `(progn
      (export ',(mapcar (compose
 			(let ((conc-name (get-conc-name class-definition-form)))
 			  (if conc-name
-			      (curry #'concatenate-symbols conc-name)
+			      (curry #'symbolicate conc-name)
 			      #'identity))
 			#'first
 			#'ensure-list)
@@ -109,12 +106,12 @@
 		     `(progn
 			(export
 			 ',(or (remove nil (mapcar #'second constructor-clauses))
-			       (list (concatenate-symbols
+			       (list (symbolicate
 				      'make- (first (second class-definition-form))))))
 			,class-definition-form)))
 	       `(progn
 		  (export
-		   '(,(concatenate-symbols
+		   '(,(symbolicate
 		      'make- (second class-definition-form))))
 		  ,class-definition-form)))
 	 (t class-definition-form)))
