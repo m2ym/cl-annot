@@ -11,8 +11,8 @@
            :export-class)
   (:import-from :alexandria
 		:ensure-list
-		:curry :rcurry :compose
-		:if-let :when-let :symbolicate))
+		:curry :compose
+		:if-let :symbolicate))
 (in-package :annot.class)
 
 (defannotation metaclass (metaclass class-definition-form)
