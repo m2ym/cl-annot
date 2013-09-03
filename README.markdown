@@ -316,21 +316,21 @@ According to the {CLHS: Macro
 DEFSTRUCT}[http://www.lispworks.com/documentation/HyperSpec/Body/m_defstr.htm],
 `defstruct` can define more than one constructor, for example:
 
-	@export-constructors
-	(defstruct (s (:constructor abya a c)
-	              (:constructor abya2 a b c))
-	  a b c)
+    @export-constructors
+    (defstruct (s (:constructor abya a c)
+                  (:constructor abya2 a b c))
+      a b c)
 
 is equivalent to
 
-    (progn								  
-	  (export '(abya abya2))				  
-	  (defstruct (s (:constructor abya a c)
-		   (:constructor abya2 a b c)) a b c))
+    (progn
+      (export '(abya abya2))
+      (defstruct (s (:constructor abya a c)
+                    (:constructor abya2 a b c)) a b c))
 
 and it might have no constructor like this.
 
-	(defstruct (s (:constructor nil)) a b c)
+    (defstruct (s (:constructor nil)) a b c)
 
 #### Annotation: `export-class` and `export-structure`
 

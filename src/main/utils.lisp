@@ -94,9 +94,9 @@ MACROEXPAND-UNTIL-NORMAL-FORM."
          (second (when (consp form)
                    (second form))))
     (if (consp second)
-	(cond 
-	  ((eq (car second) 'setf) (second second))
-	  (t (first second))) ; fix for the long-form of defstruct 
+        (cond
+          ((eq (car second) 'setf) (second second))
+          (t (first second)))    ; fix for the long-form of defstruct
         second)))
 
 (defun definition-form-type (definition-form)
