@@ -184,7 +184,7 @@ This package contains annotations `eval-when` special form.
 
     @eval-when-compile
     (defun macro-util () ...)
-    
+
 is equivalent to
 
     (eval-when-compile (:compile-toplevel)
