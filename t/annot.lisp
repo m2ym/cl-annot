@@ -19,6 +19,8 @@
 
 (defmacro fun () `(defun f ()))
 
+(plan 65)
+
 ;;;; core
 
 (is @1+ 1
