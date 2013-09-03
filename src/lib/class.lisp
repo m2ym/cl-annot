@@ -125,7 +125,6 @@
      (export-accessors
       ,class-definition-form))))
 
-
 (defmacro export-structure (class-definition-form)
   `(annot.std:export*
     (export-slots

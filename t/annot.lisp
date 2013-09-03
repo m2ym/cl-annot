@@ -76,8 +76,6 @@
       (export 'f)
       (fun))
     "@export expansion 2")
-
-
 (is-type @export (defstruct s ())
          'symbol
          "export structure")
@@ -90,8 +88,6 @@
 (is (symbol-status :s2)
     :external
     "structure exported?")
-
-
 
 ;;;; ignore and other compilation-related declarations
 
@@ -201,7 +197,6 @@
                  (b :writer b-of)
                  (c :accessor c-of))))
            "@export-accessors expansion")
-
 (is-expand @export-slots (defstruct s a b c)
            (progn (export '(a b c)) (defstruct s a b c))
            "@export-slots expansion for defstruct")
@@ -246,11 +241,11 @@
            "@export-constructors expansion for defstruct")
 (is-expand @export-constructors
            (defstruct (s (:constructor abya a c)
-			 (:constructor abya2 a b c)) a b c)
+                         (:constructor abya2 a b c)) a b c)
            (progn
              (export '(abya abya2))
              (defstruct (s (:constructor abya a c)
-			   (:constructor abya2 a b c)) a b c))
+                           (:constructor abya2 a b c)) a b c))
            "@export-constructors expansion for defstruct")
 (is-expand @export-constructors
            (defstruct (s (:constructor)) a b c)
@@ -266,10 +261,8 @@
            "@export-constructors expansion for defstruct")
 (is-expand @export-constructors
            (defstruct (s (:constructor nil)) a b c)
-           (defstruct (s (:constructor nil)) a b c)             
+           (defstruct (s (:constructor nil)) a b c)
            "@export-constructors expansion for defstruct, no constructor")
-
-
 
 (is '@required foo
     '(foo :initform (annot.slot::required-argument :foo) :initarg :foo)
