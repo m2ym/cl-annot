@@ -1,3 +1,12 @@
+;;; slime-annot.el --- cl-annot support for SLIME
+
+;; URL: https://github.com/arielnetworks/cl-annot
+;; Package-Requires: ((slime "0"))
+
+;;; Commentary:
+
+;;; Code:
+
 (require 'cl)
 (require 'slime)
 
@@ -36,3 +45,5 @@
     (setq ad-return-value (list (point) (cadr ad-return-value)))))
 
 (provide 'slime-annot)
+
+;;; slime-annot.el ends here
