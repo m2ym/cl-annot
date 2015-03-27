@@ -127,7 +127,11 @@ with name, lambda-list and the body as arguments."
   "Return class-specifiers of CLASS-DEFINITION-FORM."
   (case (first class-definition-form)
     (defclass (nth 3 (progn-form-last class-definition-form)))
-    (defstruct (nthcdr 2 (progn-form-last class-definition-form)))))
+    (defstruct (if (stringp (nth 2 (progn-form-last class-definition-form)))
+		   ;; There's a documentation string, fetch the slots after it
+		   (nthcdr 3 (progn-form-last class-definition-form))
+		   ;; There's no documentation string, fetch the slots
+		   (nthcdr 2 (progn-form-last class-definition-form))))))
 
 (defun replace-slot-specifiers (function class-definition-form)
   "Replace slot-specifiers of CLASS-DEFINITION-FORM with FUNCTION. The
