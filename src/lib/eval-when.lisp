@@ -1,3 +1,4 @@
+(in-package :cl-user)
 (defpackage cl-annot.eval-when
   (:nicknames :annot.eval-when)
   (:use :cl)
