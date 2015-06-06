@@ -1,3 +1,4 @@
+(in-package :cl-user)
 (defpackage cl-annot.syntax
   (:nicknames :annot.syntax)
   (:use :cl
