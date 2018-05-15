@@ -27,4 +27,5 @@
                                            (:file "eval-when")
                                            (:file "doc")
                                            (:file "class")
-                                           (:file "slot")))))))
+                                           (:file "slot"))))))
+  :in-order-to ((test-op (test-op cl-annot-test))))
